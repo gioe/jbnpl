@@ -1,0 +1,7 @@
+{
+  "/": "api docs",
+  "/signup": "signup",
+  "/login": "login",
+  "/logout": "logout",
+  "/user/:userId": "get/update/delete user"
+}

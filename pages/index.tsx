@@ -97,7 +97,7 @@ export default function SignInSide() {
                                 label="Remember me"
                             />
                             <Button
-                                href="/dashboard"
+                                href="/home"
                                 type="submit"
                                 fullWidth
                                 variant="contained"

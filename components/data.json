@@ -1,0 +1,261 @@
+{"purchases":[
+  {
+    "companyName": "Affirm",
+    "category":"Cosmetics",
+    "totalCost":6,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Affirm",
+    "category":"Electronics",
+    "totalCost":339,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Affirm",
+    "category":"Cosmetics",
+    "totalCost":33,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Affirm",
+    "category":"Travel",
+    "totalCost":438,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Affirm",
+    "category":"Home & Furniture",
+    "totalCost":139,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"AfterPay",
+    "category":"Travel",
+    "totalCost":705,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"AfterPay",
+    "category":"Home & Furniture",
+    "totalCost":80,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"AfterPay",
+    "category":"Electronics",
+    "totalCost":275,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"AfterPay",
+    "category":"Clothing",
+    "totalCost":50,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Klarna",
+    "category":"Home & Furniture",
+    "totalCost":103,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Klarna",
+    "category":"Travel",
+    "totalCost":676,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Klarna",
+    "category":"Electronics",
+    "totalCost":241,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Klarna",
+    "category":"Cosmetics",
+    "totalCost":15,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Klarna",
+    "category":"Travel",
+    "totalCost":706,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Klarna",
+    "category":"Electronics",
+    "totalCost":281,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Klarna",
+    "category":"Travel",
+    "totalCost":532,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Klarna",
+    "category":"Clothing",
+    "totalCost":149,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"PayPal",
+    "category":"Electronics",
+    "totalCost":251,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"PayPal",
+    "category":"Cosmetics",
+    "totalCost":59,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"PayPal",
+    "category":"Travel",
+    "totalCost":797,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"PayPal",
+    "category":"Electronics",
+    "totalCost":439,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"PayPal",
+    "category":"Electronics",
+    "totalCost":97,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"PayPal",
+    "category":"Travel",
+    "totalCost":774,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"PayPal",
+    "category":"Travel",
+    "totalCost":652,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Perpay",
+    "category":"Cosmetics",
+    "totalCost":36,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Perpay",
+    "category":"Travel",
+    "totalCost":516,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Perpay",
+    "category":"Cosmetics",
+    "totalCost":47,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Perpay",
+    "category":"Electronics",
+    "totalCost":199,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Perpay",
+    "category":"Cosmetics",
+    "totalCost":13,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Splitit",
+    "category":"Cosmetics",
+    "totalCost":65,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Splitit",
+    "category":"Electronics",
+    "totalCost":177,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Splitit",
+    "category":"Cosmetics",
+    "totalCost":26,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Splitit",
+    "category":"Clothing",
+    "totalCost":112,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Splitit",
+    "category":"Electronics",
+    "totalCost":299,
+    "purchaseDate": "",
+    "purchaseSchedule": 6
+  },
+  {
+    "companyName":"Splitit",
+    "category":"Cosmetics",
+    "totalCost":18,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Splitit",
+    "category":"Home & Furniture",
+    "totalCost":199,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  },
+  {
+    "companyName":"Splitit",
+    "category":"Cosmetics",
+    "totalCost":86,
+    "purchaseDate": "",
+    "purchaseSchedule": 12
+  }
+]}
