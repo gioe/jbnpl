@@ -18,28 +18,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    mxId: String,
     salt: String,
     created: {
         type: Date,
         default: Date.now
     },
     updated: Date,
-    photo: {
-        data: Buffer,
-        contentType: String
-    },
-    following: [{
-        type: ObjectId,
-        ref: "User"
-    }],
-    followers: [{
-        type: ObjectId,
-        ref: "User"
-    }],
-    resetPasswordLink: {
-        data: String,
-        default: ""
-    }
 })
 
 //virtual field

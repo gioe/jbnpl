@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const expressJwt = require('express-jwt');
 const User = require("../models/user");
+const { createMxUser } = require("./mxclient")
 
 exports.signup = async (req, res) => {
     const userExists = await User.findOne({
@@ -14,7 +15,9 @@ exports.signup = async (req, res) => {
         error: "User already exists"
     });
 
+    const mxUser = await createMxUser(req.body.email);
     const user = await new User(req.body);
+    user.mxId = mxUser.data.user.guid;
     await user.save()
     res.json({ message: "Signup success! Please login." });
 }
