@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from "react";
 import { PieChart } from 'react-minimal-pie-chart';
 import { Purchase } from "../helpers/types";
 import { serviceConfig, serviceList} from "../helpers/services";

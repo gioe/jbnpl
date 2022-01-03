@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from "react";
 import { useRouter } from 'next/router';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -43,7 +43,6 @@ export default function SignUp() {
 
         signup({name, email, password})
             .then(data => {
-                console.log(data)
                 if (data.error) {
                     setErrorMessage(data.error)
                 } else {

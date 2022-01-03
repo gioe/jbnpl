@@ -12,6 +12,7 @@ const morgan = require('morgan');
 // bring in routes
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
+const mxRoutes = require("./routes/mx");
 
 // apiDocs
 app.get('/', (req, res) => {
@@ -45,6 +46,7 @@ app.use(cors());
 
 app.use('/', authRoutes);
 app.use('/', userRoutes);
+app.use('/', mxRoutes);
 
 app.use(function (err, req, res) {
     if (err.name === 'UnauthorizedError') {

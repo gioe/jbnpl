@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { categoryList } from "../helpers/services";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";

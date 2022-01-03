@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from "react";
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -15,10 +15,10 @@ import LayersIcon from "@mui/icons-material/Layers";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import {ListItem, ListItemIcon, ListItemText} from "@mui/material";
 import IntegrationsContent from '../components/IntegrationsContent';
-import DashboardContent from '../components/DashboardContent';
-import { serviceList } from '../helpers/services';
-import {ServiceSelectionState, Service} from '../helpers/types';
+import {Institution} from '../helpers/types';
 import withAuth from '../components/withAuth';
+import {searchInstitutions} from "./api/mxClient";
+import {authenticate, isAuthenticated} from "./api/auth";
 
 const menuItems = [
     {
@@ -34,16 +34,11 @@ const menuItems = [
 const drawerWidth: number = 240;
 
 interface State {
-    selectionStates: ServiceSelectionState[];
+    institutions: Institution[];
 }
 
 const initialState: State = {
-    selectionStates: serviceList.map(value => {
-        return {
-            service: value,
-            isSelected: false
-        }}
-    )
+    institutions: [],
 }
 
 interface AppBarProps extends MuiAppBarProps {
@@ -102,20 +97,40 @@ const mdTheme = createTheme();
 
 function Content(props: ContentProps) {
 
-    const [selections, setSelections] = React.useState(initialState.selectionStates)
+    const [institutions, setInstitutions] = React.useState(initialState.institutions)
+    const [error, setErrorMessage] = React.useState('');
 
-    const onSelect = (selection: Service) => {
-        const selectedIndex = selections.map(e => e.service).indexOf(selection)
-        const temporaryArray = selections
-        temporaryArray[selectedIndex].isSelected = !temporaryArray[selectedIndex].isSelected
-        setSelections([...temporaryArray])
+    const handleSearch = (searchTerm: string) => {
+        searchInstitutions(searchTerm)
+            .then(data => {
+                if (data.error) {
+                    setErrorMessage(data.error)
+                } else {
+                    const searchResults = data.results.institutions.map((value: { code: string; name: string; small_logo_url: string; medium_logo_url: string; url: string; supports_account_identification: boolean; supports_account_statement: boolean; supports_account_verification: boolean; supports_oauth: boolean; supports_transaction_history: boolean; }) => {
+                        return {
+                            code: value.code,
+                            name: value.name,
+                            logoUrlSmall: value.small_logo_url,
+                            logoUrlMedium: value.medium_logo_url,
+                            url: value.url,
+                            supportsAccountIdentification: value.supports_account_identification,
+                            supportsAccountStatement: value.supports_account_statement,
+                            supportsAccountVerification: value.supports_account_verification,
+                            supportsOauth: value.supports_oauth,
+                            supportsTransactionHistory: value.supports_transaction_history,
+                        }
+                    })
+                    setInstitutions([...searchResults])
+                }
+            })
     }
 
     switch (props.contentType) {
         case "Dashboard":
-            return <DashboardContent integratedServices={selections.filter(value => value.isSelected).map(value => value.service)}/>
+            return <></>
+            // return <DashboardContent integratedServices=[] />
         case "Integrations":
-            return <IntegrationsContent integrationStates={selections} onSelect={onSelect}/>
+            return <IntegrationsContent searchResults={institutions} onSearch={handleSearch}/>
         default:
             return <> </>;
     }

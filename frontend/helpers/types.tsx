@@ -12,6 +12,19 @@ export type Purchase = {
     purchaseSchedule: number;
 }
 
+export type Institution = {
+    code: string;
+    name: string;
+    logoUrlSmall: string;
+    logoUrlMedium: string;
+    url: string;
+    supportsAccountIdentification: boolean;
+    supportsAccountStatement: boolean;
+    supportsAccountVerification: boolean;
+    supportsOauth: boolean;
+    supportsTransactionHistory: boolean;
+}
+
 export type Service = {
     name: string;
 }

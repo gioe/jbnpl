@@ -22,3 +22,15 @@ exports.createMxUser = async (email) => {
     const mxresponse = await mxclient.createUser(requestBody);
     return mxresponse
 }
+
+exports.searchInstitutions = async (req, res) => {
+    const name = req.params.institutionId;
+    const page = 1;
+    const recordsPerPage = 10;
+    const supportsAccountIdentification = true;
+    const supportsAccountStatement = true;
+    const supportsAccountVerification = true;
+    const supportsTransactionHistory = true;
+    const mxresponse = await mxclient.listInstitutions(name, page, recordsPerPage, supportsAccountIdentification, supportsAccountStatement, supportsAccountVerification, supportsTransactionHistory);
+    res.json({ results: mxresponse.data });
+}
