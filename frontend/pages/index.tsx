@@ -10,7 +10,9 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {authenticate, login} from "./api/auth";
+import {login} from "./api/auth";
+import { useCookies } from 'react-cookie';
+import {GetServerSideProps} from "next";
 
 function Copyright(props: any) {
     return (
@@ -30,6 +32,7 @@ const theme = createTheme();
 const SignupPage = () => {
     const router = useRouter();
     const [error, setErrorMessage] = React.useState('');
+    const [cookies, setCookie, removeCookie] = useCookies(['jwt']);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -43,9 +46,8 @@ const SignupPage = () => {
                 if (data.error) {
                     setErrorMessage(data.error)
                 } else {
-                    authenticate(data, () => {
-                        router.push('/home')
-                    })
+                    setCookie('jwt', JSON.stringify(data), { path: '/', maxAge: 3600, sameSite: true });
+                    router.push('/home')
                 }
             })
     };

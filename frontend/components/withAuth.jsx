@@ -5,7 +5,7 @@ const withAuth = Component => {
     const Auth = (props) => {
 
         // If user is not logged in, return login component
-        if (!isAuthenticated) {
+        if (!isAuthenticated()) {
             return (
                 <SignupPage />
             );

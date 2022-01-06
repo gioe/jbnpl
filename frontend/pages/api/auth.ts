@@ -1,4 +1,6 @@
 import { User } from '../../helpers/types'
+import { instanceOf } from 'prop-types';
+import { useCookies } from 'react-cookie';
 
 export const signup = (user: User) => {
     return fetch(`${process.env.API_URL}/signup`,{
@@ -25,6 +27,7 @@ export const login = (user: User) => {
         body: JSON.stringify(user)
     })
         .then(response => {
+            console.log(response)
             return response.json()
         })
         .catch(err => console.log(err))
@@ -43,9 +46,13 @@ export const logout = (next: () => void) => {
 }
 
 export const isAuthenticated = () => {
+    if (typeof window ==="undefined") {
+        return false
+    }
+
     const token = localStorage.getItem("jwt")
 
-    if(typeof window ==="undefined" || !token) {
+    if (!token) {
         return false
     } else {
         return JSON.parse(token);

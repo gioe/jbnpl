@@ -1,4 +1,6 @@
 import React from "react";
+import { GetServerSideProps } from 'next'
+import AccountsContent from '../components/AccountsContent';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -13,14 +15,22 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import LayersIcon from "@mui/icons-material/Layers";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import SearchIcon from '@mui/icons-material/Search';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import {ListItem, ListItemIcon, ListItemText} from "@mui/material";
-import IntegrationsContent from '../components/IntegrationsContent';
-import {Institution} from '../helpers/types';
+import SearchContent from '../components/SearchContent';
+import {Account, Institution, Membership} from '../helpers/types';
 import withAuth from '../components/withAuth';
-import {searchInstitutions} from "./api/mxClient";
-import {authenticate, isAuthenticated} from "./api/auth";
+import {searchInstitutions, getAllMemberships, getAllAccounts} from "./api/mxClient";
+import IntegrationsContent from "../components/IntegrationsContent";
+import {ParsedUrlQuery} from "querystring";
+import {AccountSubtype, AccountType} from "../helpers/enums";
 
 const menuItems = [
+    {
+        text: "Search",
+        icon: <SearchIcon />,
+    },
     {
         text: "Dashboard",
         icon: <DashboardIcon />,
@@ -28,6 +38,10 @@ const menuItems = [
     {
         text: "Integrations",
         icon: <LayersIcon />,
+    },
+    {
+        text: "Accounts",
+        icon: <AccountBalanceIcon />,
     },
 ]
 
@@ -47,6 +61,14 @@ interface AppBarProps extends MuiAppBarProps {
 
 interface ContentProps {
     contentType: string;
+    memberships: Membership[];
+    accounts: Account[];
+    handleFetchedMemberships: (fetchedMemberships: Membership[]) => void;
+}
+
+interface HomeProps {
+    memberships: Membership[];
+    accounts: Account[];
 }
 
 const AppBar = styled(MuiAppBar, {
@@ -128,21 +150,31 @@ function Content(props: ContentProps) {
     switch (props.contentType) {
         case "Dashboard":
             return <></>
-            // return <DashboardContent integratedServices=[] />
         case "Integrations":
-            return <IntegrationsContent searchResults={institutions} onSearch={handleSearch}/>
+            return <IntegrationsContent memberships={props.memberships}/>
+        case "Search":
+            return <SearchContent searchResults={institutions} onSearch={handleSearch} handleFetchedMemberships={props.handleFetchedMemberships}/>
+        case "Accounts":
+            return <AccountsContent accounts={props.accounts} />
         default:
             return <> </>;
     }
 }
 
-const Home = () => {
+const Home = (props: HomeProps) => {
     const [open, setOpen] = React.useState(true);
     const [contentType, setContentType] = React.useState("Dashboard");
+    const [memberships, setMemberships] = React.useState(props.memberships)
+    const [accounts, setAccounts] = React.useState(props.accounts)
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
+
+    const handleFetchedMemberships = (memberships: Membership[]) => {
+        setContentType("Integrations")
+        setMemberships([...memberships])
+    }
 
     return (
         <ThemeProvider theme={mdTheme}>
@@ -205,7 +237,11 @@ const Home = () => {
                     </List>
                 </Drawer>
                 <Box>
-                    <Content  contentType={contentType}/>
+                    <Content
+                        contentType={contentType}
+                        memberships={memberships}
+                        accounts={accounts}
+                        handleFetchedMemberships={handleFetchedMemberships}/>
                 </Box>
             </Box>
         </ThemeProvider>
@@ -213,3 +249,33 @@ const Home = () => {
 }
 
 export default withAuth(Home);
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const mxId = JSON.parse(context.req.cookies.jwt).user.mxId
+    const fetchedMemberships = await getAllMemberships()
+    const fetchedAccounts = await getAllAccounts(mxId)
+
+    const accounts = fetchedAccounts.response.map((value: { guid: any; id: any; member_guid: any; user_guid: any; account_number: any; available_balance: any; balance: any; currency_code: any; institution_code: any; name: any; type: any; subtype: any; }) => {
+        return {
+            guid: value.guid,
+            id: value.id,
+            memberGuid: value.member_guid,
+            userGuid: value.user_guid,
+            accountNumber: value.account_number,
+            availableBalance: value.available_balance,
+            balance: value.balance,
+            currencyCode: value.currency_code,
+            institutionCode: value.institution_code,
+            name: value.name,
+            type: value.type,
+            subType: value.subtype,
+        }
+    }) as Account[]
+
+    return {
+        props: {
+            memberships: fetchedMemberships,
+            accounts
+        },
+    };
+};

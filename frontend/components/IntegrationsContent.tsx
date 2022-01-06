@@ -1,50 +1,33 @@
 import React from "react";
 import AppBar from '@mui/material/AppBar';
 import CssBaseline from '@mui/material/CssBaseline';
-import Grid from '@mui/material/Grid';
 import Toolbar from '@mui/material/Toolbar';
-import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import InstitutionCard from './InstitutionCard';
-import {Institution} from "../helpers/types";
-import SearchInput from 'react-search-input'
+import Box from '@mui/material/Box';
+import MembershipCard from "./MembershipCard";
+import {Membership} from "../helpers/types";
 
 const theme = createTheme();
 
-interface IntegrationProps {
-    onSearch: (seachTerm: string) => void;
-    searchResults: Institution[];
+interface Props {
+    memberships: Membership[];
 }
 
-function IntegrationsList(props: IntegrationProps) {
+const Content: React.FC<Props> = (props) => {
     return <ThemeProvider theme={theme}>
         <CssBaseline />
         <AppBar position="relative">
             <Toolbar>
             </Toolbar>
         </AppBar>
-        <main>
-            <Container sx={{ py: 8 }}>
-                <SearchInput
-                    style={
-                    {
-                        width: '100%',
-                        height: '50px',
-                    }}
-                    className="search-input"
-                    onChange={props.onSearch} />
-            </Container>
-            <Container sx={{ py: 8 }} maxWidth="md">
-                <Grid container spacing={4}>
-                    {props.searchResults.map((institution) => (
-                        <InstitutionCard key={institution.name} institution={institution} />
-                    ))}
-                </Grid>
-            </Container>
-        </main>
+        <Box>
+            {props.memberships.length > 0 ? props.memberships.map((membership) => (
+                <MembershipCard key={membership.name} membership={membership} />
+            )) : <></>}
+        </Box>
     </ThemeProvider>;
 }
 
-export default function Integrations(props: IntegrationProps) {
-    return <IntegrationsList searchResults={props.searchResults} onSearch={props.onSearch}/>;
+export default function IntegrationsContent(props: Props) {
+    return <Content memberships={props.memberships}/>;
 }
