@@ -1,4 +1,6 @@
-import {AccountSubtype, AccountType, ConnectionStatus} from "./enums";
+import { ConnectionStatus, } from "./userEnums";
+import { AccountSubtype, AccountType } from "./accountEnums";
+import { TopLevelTransactionCategory, TransactionCategory } from "./transactionEnums";
 
 export type User = {
     name: null | string;
@@ -15,11 +17,11 @@ export type Purchase = {
 }
 
 export type Transaction = {
-    category: string;
+    category: TransactionCategory;
     createdAt: string;
     date:string;
     postedAt: string;
-    topLevelCategory: string;
+    topLevelCategory: TopLevelTransactionCategory;
     transactedAt: string;
     type: string;
     accountGuid: string;

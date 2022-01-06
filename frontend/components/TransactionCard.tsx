@@ -17,8 +17,11 @@ export default function TransactionCard({transaction}: TransactionCardProps) {
             <Card sx={{ display: 'flex' }}>
                 <Box>
                     <CardContent sx={{ flex: '1 0 auto' }}>
-                        <Typography component="div" variant="h5">
-                            {transaction.amount}
+                        <Typography component="div">
+                            ${transaction.amount}
+                        </Typography>
+                        <Typography component="div">
+                            {transaction.description}
                         </Typography>
                     </CardContent>
                 </Box>

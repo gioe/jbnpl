@@ -9,7 +9,7 @@ import {createTheme, ThemeProvider} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import { AccountType } from "../helpers/enums";
+import { AccountType } from "../helpers/accountEnums";
 
 const theme = createTheme();
 

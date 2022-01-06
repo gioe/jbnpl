@@ -14,38 +14,33 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import LayersIcon from "@mui/icons-material/Layers";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import SearchIcon from '@mui/icons-material/Search';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import {ListItem, ListItemIcon, ListItemText} from "@mui/material";
 import SearchContent from '../components/SearchContent';
 import {Account, Institution, Membership, Transaction} from '../helpers/types';
-import withAuth from '../components/withAuth';
 import {searchInstitutions, getAllMemberships, getAllAccounts, getAllTransactions} from "./api/mxClient";
 import IntegrationsContent from "../components/IntegrationsContent";
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TransactionsContent from "../components/TransactionsContent";
+import { cookiesAreAuthenticated} from "./api/auth";
 
 const menuItems = [
     {
-        text: "Search",
-        icon: <SearchIcon />,
-    },
-    {
-        text: "Dashboard",
-        icon: <DashboardIcon />,
-    },
-    {
-        text: "Integrations",
-        icon: <LayersIcon />,
+        text: "Transactions",
+        icon: <AttachMoneyIcon />,
     },
     {
         text: "Accounts",
         icon: <AccountBalanceIcon />,
     },
     {
-        text: "Transactions",
-        icon: <AttachMoneyIcon />,
+        text: "Search",
+        icon: <SearchIcon />,
+    },
+    {
+        text: "Integrations",
+        icon: <LayersIcon />,
     },
 ]
 
@@ -154,8 +149,6 @@ function Content(props: ContentProps) {
     }
 
     switch (props.contentType) {
-        case "Dashboard":
-            return <></>
         case "Integrations":
             return <IntegrationsContent memberships={props.memberships}/>
         case "Search":
@@ -171,7 +164,7 @@ function Content(props: ContentProps) {
 
 const Home = (props: HomeProps) => {
     const [open, setOpen] = React.useState(true);
-    const [contentType, setContentType] = React.useState("Dashboard");
+    const [contentType, setContentType] = React.useState("Transactions");
     const [memberships, setMemberships] = React.useState(props.memberships)
     const [accounts, setAccounts] = React.useState(props.accounts)
     const [transactions, setTransactions] = React.useState(props.transactions)
@@ -258,13 +251,25 @@ const Home = (props: HomeProps) => {
     );
 }
 
-export default withAuth(Home);
+export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    const authenticated = cookiesAreAuthenticated(context)
+
+    if (!authenticated) {
+        return {
+            redirect: {
+                permanent: false,
+                destination: "/",
+            },
+            props:{},
+        };
+    }
+
     const mxId = JSON.parse(context.req.cookies.jwt).user.mxId
     const fetchedMemberships = await getAllMemberships()
     const fetchedAccounts = await getAllAccounts(mxId)
-    const fetchedTransactions = await getAllTransactions(mxId)
+    const fetchedTransactions = await getAllTransactions(mxId, 1)
 
     const transactions = fetchedTransactions.response.transactions.map((value: { category: any; created_at: any; date: any; posted_at: any; top_level_category: any; transacted_at: any; type: any; account_guid: any; amount: any; description: any; guid: any; is_expense: any; is_bill_pay: any; is_direct_deposit: any; is_fee: any; is_income: any; is_overdraft_fee: any; is_subscription: any; member_guid: any; merchant_guid: any; original_description: any; user_guid: any; }) => {
         return {
@@ -314,7 +319,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: {
             memberships: fetchedMemberships,
             accounts,
-            transactions
+            transactions,
         },
     };
 };

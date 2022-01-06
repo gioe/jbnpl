@@ -88,9 +88,9 @@ export const getAllAccounts = (mxId: string) => {
         .catch(err => console.log(err))
 }
 
-export const getAllTransactions = (mxId: string) => {
+export const getAllTransactions = (mxId: string, page: number) => {
 
-    return fetch(`${process.env.API_URL}/user/${mxId}/transactions`,{
+    return fetch(`${process.env.API_URL}/user/${mxId}/transactions/${page}`,{
         method: "GET",
         headers: {
             Accept: "application/json",

@@ -1,6 +1,7 @@
 import { User } from '../../helpers/types'
 import { instanceOf } from 'prop-types';
 import { useCookies } from 'react-cookie';
+import {GetServerSidePropsContext} from "next";
 
 export const signup = (user: User) => {
     return fetch(`${process.env.API_URL}/signup`,{
@@ -59,9 +60,13 @@ export const isAuthenticated = () => {
     }
 }
 
-export const authenticate = (jwt: string, next: () => void) => {
+export const authenticate = (jwt: string) => {
+    console.log(jwt)
     if(typeof window !== "undefined") {
         localStorage.setItem("jwt", JSON.stringify(jwt))
-        next()
     }
+}
+
+export const cookiesAreAuthenticated = (context: GetServerSidePropsContext) => {
+    return context.req.cookies.jwt != undefined;
 }
