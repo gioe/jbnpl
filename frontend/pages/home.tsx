@@ -19,12 +19,12 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import {ListItem, ListItemIcon, ListItemText} from "@mui/material";
 import SearchContent from '../components/SearchContent';
-import {Account, Institution, Membership} from '../helpers/types';
+import {Account, Institution, Membership, Transaction} from '../helpers/types';
 import withAuth from '../components/withAuth';
-import {searchInstitutions, getAllMemberships, getAllAccounts} from "./api/mxClient";
+import {searchInstitutions, getAllMemberships, getAllAccounts, getAllTransactions} from "./api/mxClient";
 import IntegrationsContent from "../components/IntegrationsContent";
-import {ParsedUrlQuery} from "querystring";
-import {AccountSubtype, AccountType} from "../helpers/enums";
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import TransactionsContent from "../components/TransactionsContent";
 
 const menuItems = [
     {
@@ -42,6 +42,10 @@ const menuItems = [
     {
         text: "Accounts",
         icon: <AccountBalanceIcon />,
+    },
+    {
+        text: "Transactions",
+        icon: <AttachMoneyIcon />,
     },
 ]
 
@@ -63,12 +67,14 @@ interface ContentProps {
     contentType: string;
     memberships: Membership[];
     accounts: Account[];
+    transactions: Transaction[];
     handleFetchedMemberships: (fetchedMemberships: Membership[]) => void;
 }
 
 interface HomeProps {
     memberships: Membership[];
     accounts: Account[];
+    transactions: Transaction[];
 }
 
 const AppBar = styled(MuiAppBar, {
@@ -156,6 +162,8 @@ function Content(props: ContentProps) {
             return <SearchContent searchResults={institutions} onSearch={handleSearch} handleFetchedMemberships={props.handleFetchedMemberships}/>
         case "Accounts":
             return <AccountsContent accounts={props.accounts} />
+        case "Transactions":
+            return <TransactionsContent transactions={props.transactions} />
         default:
             return <> </>;
     }
@@ -166,6 +174,7 @@ const Home = (props: HomeProps) => {
     const [contentType, setContentType] = React.useState("Dashboard");
     const [memberships, setMemberships] = React.useState(props.memberships)
     const [accounts, setAccounts] = React.useState(props.accounts)
+    const [transactions, setTransactions] = React.useState(props.transactions)
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -241,6 +250,7 @@ const Home = (props: HomeProps) => {
                         contentType={contentType}
                         memberships={memberships}
                         accounts={accounts}
+                        transactions={transactions}
                         handleFetchedMemberships={handleFetchedMemberships}/>
                 </Box>
             </Box>
@@ -254,6 +264,34 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const mxId = JSON.parse(context.req.cookies.jwt).user.mxId
     const fetchedMemberships = await getAllMemberships()
     const fetchedAccounts = await getAllAccounts(mxId)
+    const fetchedTransactions = await getAllTransactions(mxId)
+
+    const transactions = fetchedTransactions.response.transactions.map((value: { category: any; created_at: any; date: any; posted_at: any; top_level_category: any; transacted_at: any; type: any; account_guid: any; amount: any; description: any; guid: any; is_expense: any; is_bill_pay: any; is_direct_deposit: any; is_fee: any; is_income: any; is_overdraft_fee: any; is_subscription: any; member_guid: any; merchant_guid: any; original_description: any; user_guid: any; }) => {
+        return {
+            category: value.category,
+            createdAt: value.created_at,
+            date:value.date,
+            postedAt: value.posted_at,
+            topLevelCategory: value.top_level_category,
+            transactedAt: value.transacted_at,
+            type: value.type,
+            accountGuid: value.account_guid,
+            amount: value.amount,
+            description: value.description,
+            guid: value.guid,
+            isExpense: value.is_expense,
+            isBillPay: value.is_bill_pay,
+            isDirectDeposit: value.is_direct_deposit,
+            isFee: value.is_fee,
+            isIncome: value.is_income,
+            isOverdraftFee: value.is_overdraft_fee,
+            isSubscription: value.is_subscription,
+            memberGuid: value.member_guid,
+            merchantGuid: value.merchant_guid,
+            originalDescription: value.original_description,
+            userGuid: value.user_guid
+        }
+    }) as Transaction[]
 
     const accounts = fetchedAccounts.response.map((value: { guid: any; id: any; member_guid: any; user_guid: any; account_number: any; available_balance: any; balance: any; currency_code: any; institution_code: any; name: any; type: any; subtype: any; }) => {
         return {
@@ -275,7 +313,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
         props: {
             memberships: fetchedMemberships,
-            accounts
+            accounts,
+            transactions
         },
     };
 };
