@@ -57,10 +57,14 @@ export type Account = {
 }
 
 export type Membership = {
-    connectionStatus: ConnectionStatus;
     guid: string;
+    aggregatedAt: string;
     isBeingAggregated: boolean;
+    successfullyAggregatedAt: string;
+    connectionStatus: ConnectionStatus;
+    isAuthenticated: boolean;
     name: string;
+    institutionCode: string;
     userGuid: string;
 }
 

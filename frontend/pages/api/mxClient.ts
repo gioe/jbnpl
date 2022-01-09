@@ -30,6 +30,7 @@ export const fetchInstitutionCredentials = (institution: Institution) => {
 }
 
 export const establishMembership = (membershipRequest: MembershipRequest) => {
+    console.log(membershipRequest)
     const userId = isAuthenticated().user._id
     return fetch(`${process.env.API_URL}/mx/membership/${userId}/`,{
         method: "POST",
@@ -45,8 +46,25 @@ export const establishMembership = (membershipRequest: MembershipRequest) => {
         .catch(err => console.log(err))
 }
 
-export const getAllMemberships = () => {
-    return fetch(`${process.env.API_URL}/memberships/`,{
+export const updateMembership = (membershipRequest: MembershipRequest) => {
+    const userId = isAuthenticated().user._id
+
+    return fetch(`${process.env.API_URL}'/user/${userId}/members/${userId}'/`,{
+        method: "PUT",
+        headers: {
+            Accept: "application/json",
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(membershipRequest)
+    })
+        .then(response => {
+            return response.json()
+        })
+        .catch(err => console.log(err))
+}
+
+export const refreshMemberships = (mxId: string) => {
+    return fetch(`${process.env.API_URL}/memberships/${mxId}/`,{
         method: "GET",
         headers: {
             Accept: "application/json",
@@ -91,6 +109,34 @@ export const getAllAccounts = (mxId: string) => {
 export const getAllTransactions = (mxId: string, page: number) => {
 
     return fetch(`${process.env.API_URL}/user/${mxId}/transactions/${page}`,{
+        method: "GET",
+        headers: {
+            Accept: "application/json",
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => {
+            return response.json()
+        })
+        .catch(err => console.log(err))
+}
+
+export const getMemberStatus = (mxId: string) => {
+    return fetch(`${process.env.API_URL}/user/${mxId}/members/${mxId}/status`,{
+        method: "GET",
+        headers: {
+            Accept: "application/json",
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => {
+            return response.json()
+        })
+        .catch(err => console.log(err))
+}
+
+export const aggregateMembership = (userGuid: string, memberGuid: string) => {
+    return fetch(`${process.env.API_URL}/users/${userGuid}/members/${memberGuid}/aggregate`,{
         method: "GET",
         headers: {
             Accept: "application/json",

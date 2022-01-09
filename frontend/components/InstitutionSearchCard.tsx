@@ -21,7 +21,7 @@ export default function InstitutionSearchCard({institution, selectInstitution}: 
     }
 
     return (
-        <Grid item key={institution.name} xs={12} sm={6} md={4}>
+        <Grid item key={institution.name}>
             <Card sx={{ display: 'flex' }}>
                 <Box>
                     <CardContent sx={{ flex: '1 0 auto' }}>
@@ -29,12 +29,13 @@ export default function InstitutionSearchCard({institution, selectInstitution}: 
                             {institution.name}
                         </Typography>
                     </CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center'}}>
                     </Box>
                     <CardActions>
-                        <Button size="small"
+                        <Button variant="outlined"
                                 onClick={selectAuthenticate}>
-                            Authenticate</Button>
+                            Authenticate
+                        </Button>
                     </CardActions>
                 </Box>
                 <CardMedia

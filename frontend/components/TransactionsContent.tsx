@@ -59,8 +59,6 @@ function Content(props: TransactionsProps) {
         return 0;
     })
 
-    console.log(categories)
-
     return <ThemeProvider theme={theme}>
         <CssBaseline />
         <AppBar position="relative">

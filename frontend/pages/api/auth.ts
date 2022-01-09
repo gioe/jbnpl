@@ -28,7 +28,6 @@ export const login = (user: User) => {
         body: JSON.stringify(user)
     })
         .then(response => {
-            console.log(response)
             return response.json()
         })
         .catch(err => console.log(err))
@@ -61,7 +60,6 @@ export const isAuthenticated = () => {
 }
 
 export const authenticate = (jwt: string) => {
-    console.log(jwt)
     if(typeof window !== "undefined") {
         localStorage.setItem("jwt", JSON.stringify(jwt))
     }

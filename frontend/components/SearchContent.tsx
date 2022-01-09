@@ -11,9 +11,11 @@ import SearchInput from 'react-search-input'
 import ReactModal from 'react-modal';
 import {isAuthenticated} from "../pages/api/auth";
 import {establishMembership, fetchInstitutionCredentials} from "../pages/api/mxClient";
-import Box from "@mui/material/Box";
+import Stack from '@mui/material/Stack';
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
+import Button from "@mui/material/Button";
+import {ConnectionStatus} from "../helpers/userEnums";
 
 const theme = createTheme();
 
@@ -48,14 +50,17 @@ function Content(props: SearchProps) {
     const [showModal, setShowModal] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
     const [selectedInstitutionCode, setSelectedInstitutionCode] = React.useState("");
-    const [errorMessage, setErrorMessage] = React.useState("");
+    const [error, setError] = React.useState(false);
     const [credentialRequests, setCredentialRequests] = React.useState(initialState.credentialRequests);
+    const [submitButtonDisabled, setSubmitButtonDisabled] = React.useState(true);
 
     const handleChange = (event: any) => {
         const id = event.target.id
         const value = event.target.value
         const index = credentialRequests.findIndex(element => element.guid == id)
         credentialRequests[index].value = value
+        const credentialsAreMissing = credentialRequests.filter(credential => credential.value.length == 0).length > 0
+        setSubmitButtonDisabled(credentialsAreMissing)
         setCredentialRequests([...credentialRequests])
     }
 
@@ -86,6 +91,10 @@ function Content(props: SearchProps) {
             })
     };
 
+    const escape = () => {
+        setShowModal(false)
+    }
+
     const submitCredentials = () => {
         setLoading(true)
         const request = {
@@ -96,19 +105,28 @@ function Content(props: SearchProps) {
 
         establishMembership(request)
             .then(data => {
-                console.log(data)
-                const memberships = data.response.map((value: { connection_status: any; guid: any; is_being_aggregated: any; name: any; user_guid: any; }) => {
-                    return {
-                        connectionStatus: value.connection_status,
-                        guid: value.guid,
-                        isBeingAggregated: value.is_being_aggregated,
-                        name: value.name,
-                        userGuid: value.user_guid,
-                    }
-                }) as Membership[]
-                props.handleFetchedMemberships(memberships)
-                setLoading(false)
-                setShowModal(false)
+                if (data.error) {
+                    setError(true)
+                    setLoading(false)
+                } else {
+                    const memberships = data.response.map((value: { user_guid: string; guid: any; aggregated_at: any; is_being_aggregated: any; successfully_aggregated_at: any; connection_status: any; is_authenticated: any; name: any; institution_code: any; }) => {
+                        return {
+                            guid: value.guid,
+                            aggregatedAt: value.aggregated_at,
+                            isBeingAggregated: value.is_being_aggregated,
+                            successfullyAggregatedAt: value.successfully_aggregated_at,
+                            connectionStatus: value.connection_status,
+                            isAuthenticated: value.is_authenticated,
+                            name: value.name,
+                            institutionCode: value.institution_code,
+                            userGuid: value.user_guid
+                        }
+                    }) as Membership[]
+                    props.handleFetchedMemberships(memberships)
+                    setError(false)
+                    setLoading(false)
+                    setShowModal(false)
+                }
             })
     }
 
@@ -118,45 +136,64 @@ function Content(props: SearchProps) {
             <Toolbar>
             </Toolbar>
         </AppBar>
-        <main>
-            <Container sx={{ py: 8 }}>
-                <SearchInput
+        <Container sx={{ py: 8 }}>
+            <SearchInput
                     style={
                     {
-                        width: '100%',
                         height: '50px',
                     }}
                     className="search-input"
                     onChange={props.onSearch} />
-            </Container>
-            <Container sx={{ py: 8 }} maxWidth="md">
-                <ReactModal
+        </Container>
+        <Container sx={{ py: 8 }} maxWidth="md">
+            <ReactModal
                     isOpen={showModal}
                     contentLabel=""
                     style={customStyles}
+            >
+                <Stack
+                    component="form"
+                    sx={{
+                        width: '25ch',
+                    }}
+                    spacing={2}
+                    noValidate
+                    autoComplete="off"
                 >
-                    <Box>
-                        {credentials.map((credential) => {
-                            return <TextField key={credential.fieldType} id={credential.guid}
-                                              label={credential.fieldName} variant="outlined" onChange={handleChange}/>
-                        })}
-                        <LoadingButton
-                            onClick={submitCredentials}
-                            loading={loading}
-                            loadingIndicator="Loading..."
-                            variant="outlined"
-                        >
-                            Submit
-                        </LoadingButton>
-                    </Box>
-                </ReactModal>
-                <Grid container spacing={4}>
-                    {props.searchResults.map((institution) => (
-                        <InstitutionCard key={institution.name} institution={institution} selectInstitution={selectInstitution}/>
-                    ))}
-                </Grid>
-            </Container>
-        </main>
+                    {credentials.map((credential) => {
+                        let fieldType = undefined
+                        if (credential.fieldType == "PASSWORD") {
+                            fieldType = "password"
+                        }
+                        return <TextField key={credential.fieldType}
+                                          id={credential.guid}
+                                          label={credential.fieldName}
+                                          type={fieldType}
+                                          error={error}
+                                          variant="outlined"
+                                          onChange={handleChange}/>
+                    })}
+                    <LoadingButton
+                        onClick={submitCredentials}
+                        loading={loading}
+                        loadingIndicator="Loading..."
+                        variant="outlined"
+                        disabled={submitButtonDisabled}
+                    >
+                        Submit
+                    </LoadingButton>
+                    <Button variant="outlined"
+                            onClick={escape}>
+                        Cancel
+                    </Button>
+                </Stack>
+            </ReactModal>
+            <Grid container spacing={4}>
+                {props.searchResults.map((institution) => (
+                    <InstitutionCard key={institution.name} institution={institution} selectInstitution={selectInstitution}/>
+                ))}
+            </Grid>
+        </Container>
     </ThemeProvider>;
 }
 

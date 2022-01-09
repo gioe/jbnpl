@@ -19,11 +19,17 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import {ListItem, ListItemIcon, ListItemText} from "@mui/material";
 import SearchContent from '../components/SearchContent';
 import {Account, Institution, Membership, Transaction} from '../helpers/types';
-import {searchInstitutions, getAllMemberships, getAllAccounts, getAllTransactions} from "./api/mxClient";
-import IntegrationsContent from "../components/IntegrationsContent";
+import {
+    searchInstitutions,
+    getAllAccounts,
+    getAllTransactions,
+    refreshMemberships
+} from "./api/mxClient";
+import ConnectionsContent from "../components/ConnectionsContent";
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TransactionsContent from "../components/TransactionsContent";
 import { cookiesAreAuthenticated} from "./api/auth";
+import { parseMemberships, parseTransactions, parseAccounts } from "../helpers/modelParsers";
 
 const menuItems = [
     {
@@ -39,7 +45,7 @@ const menuItems = [
         icon: <SearchIcon />,
     },
     {
-        text: "Integrations",
+        text: "Connections",
         icon: <LayersIcon />,
     },
 ]
@@ -124,33 +130,43 @@ function Content(props: ContentProps) {
     const [error, setErrorMessage] = React.useState('');
 
     const handleSearch = (searchTerm: string) => {
-        searchInstitutions(searchTerm)
-            .then(data => {
-                if (data.error) {
-                    setErrorMessage(data.error)
-                } else {
-                    const searchResults = data.results.institutions.map((value: { code: string; name: string; small_logo_url: string; medium_logo_url: string; url: string; supports_account_identification: boolean; supports_account_statement: boolean; supports_account_verification: boolean; supports_oauth: boolean; supports_transaction_history: boolean; }) => {
-                        return {
-                            code: value.code,
-                            name: value.name,
-                            logoUrlSmall: value.small_logo_url,
-                            logoUrlMedium: value.medium_logo_url,
-                            url: value.url,
-                            supportsAccountIdentification: value.supports_account_identification,
-                            supportsAccountStatement: value.supports_account_statement,
-                            supportsAccountVerification: value.supports_account_verification,
-                            supportsOauth: value.supports_oauth,
-                            supportsTransactionHistory: value.supports_transaction_history,
-                        }
-                    })
-                    setInstitutions([...searchResults])
-                }
-            })
+        if (searchTerm == '') {
+            setInstitutions([])
+        } else {
+            searchInstitutions(searchTerm)
+                .then(data => {
+                    if (data.error) {
+                        setErrorMessage(data.error)
+                    } else {
+                        const membershipKeys = props.memberships.map(membership => {
+                            return membership.name
+                        })
+                        const searchResults = data.results.institutions.map((value: { code: string; name: string; small_logo_url: string; medium_logo_url: string; url: string; supports_account_identification: boolean; supports_account_statement: boolean; supports_account_verification: boolean; supports_oauth: boolean; supports_transaction_history: boolean; }) => {
+                            return {
+                                code: value.code,
+                                name: value.name,
+                                logoUrlSmall: value.small_logo_url,
+                                logoUrlMedium: value.medium_logo_url,
+                                url: value.url,
+                                supportsAccountIdentification: value.supports_account_identification,
+                                supportsAccountStatement: value.supports_account_statement,
+                                supportsAccountVerification: value.supports_account_verification,
+                                supportsOauth: value.supports_oauth,
+                                supportsTransactionHistory: value.supports_transaction_history,
+                            }
+                        }).filter((value: { name: string; }) => {
+                            return !membershipKeys.includes(value.name)
+                        })
+
+                        setInstitutions([...searchResults])
+                    }
+                })
+        }
     }
 
     switch (props.contentType) {
-        case "Integrations":
-            return <IntegrationsContent memberships={props.memberships}/>
+        case "Connections":
+            return <ConnectionsContent memberships={props.memberships}/>
         case "Search":
             return <SearchContent searchResults={institutions} onSearch={handleSearch} handleFetchedMemberships={props.handleFetchedMemberships}/>
         case "Accounts":
@@ -267,59 +283,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     const mxId = JSON.parse(context.req.cookies.jwt).user.mxId
-    const fetchedMemberships = await getAllMemberships()
+    const fetchedMemberships = await refreshMemberships(mxId)
     const fetchedAccounts = await getAllAccounts(mxId)
     const fetchedTransactions = await getAllTransactions(mxId, 1)
 
-    const transactions = fetchedTransactions.response.transactions.map((value: { category: any; created_at: any; date: any; posted_at: any; top_level_category: any; transacted_at: any; type: any; account_guid: any; amount: any; description: any; guid: any; is_expense: any; is_bill_pay: any; is_direct_deposit: any; is_fee: any; is_income: any; is_overdraft_fee: any; is_subscription: any; member_guid: any; merchant_guid: any; original_description: any; user_guid: any; }) => {
-        return {
-            category: value.category,
-            createdAt: value.created_at,
-            date:value.date,
-            postedAt: value.posted_at,
-            topLevelCategory: value.top_level_category,
-            transactedAt: value.transacted_at,
-            type: value.type,
-            accountGuid: value.account_guid,
-            amount: value.amount,
-            description: value.description,
-            guid: value.guid,
-            isExpense: value.is_expense,
-            isBillPay: value.is_bill_pay,
-            isDirectDeposit: value.is_direct_deposit,
-            isFee: value.is_fee,
-            isIncome: value.is_income,
-            isOverdraftFee: value.is_overdraft_fee,
-            isSubscription: value.is_subscription,
-            memberGuid: value.member_guid,
-            merchantGuid: value.merchant_guid,
-            originalDescription: value.original_description,
-            userGuid: value.user_guid
-        }
-    }) as Transaction[]
-
-    const accounts = fetchedAccounts.response.map((value: { guid: any; id: any; member_guid: any; user_guid: any; account_number: any; available_balance: any; balance: any; currency_code: any; institution_code: any; name: any; type: any; subtype: any; }) => {
-        return {
-            guid: value.guid,
-            id: value.id,
-            memberGuid: value.member_guid,
-            userGuid: value.user_guid,
-            accountNumber: value.account_number,
-            availableBalance: value.available_balance,
-            balance: value.balance,
-            currencyCode: value.currency_code,
-            institutionCode: value.institution_code,
-            name: value.name,
-            type: value.type,
-            subType: value.subtype,
-        }
-    }) as Account[]
-
     return {
         props: {
-            memberships: fetchedMemberships,
-            accounts,
-            transactions,
+            memberships: parseMemberships(fetchedMemberships),
+            accounts: parseAccounts(fetchedAccounts.response),
+            transactions: parseTransactions(fetchedTransactions.response),
         },
     };
 };

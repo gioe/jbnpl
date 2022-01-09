@@ -22,12 +22,12 @@ const Content: React.FC<Props> = (props) => {
         </AppBar>
         <Box>
             {props.memberships.length > 0 ? props.memberships.map((membership) => (
-                <MembershipCard key={membership.name} membership={membership} />
+                <MembershipCard key={membership.guid} membership={membership} />
             )) : <></>}
         </Box>
     </ThemeProvider>;
 }
 
-export default function IntegrationsContent(props: Props) {
+export default function ConnectionsContent(props: Props) {
     return <Content memberships={props.memberships}/>;
 }
