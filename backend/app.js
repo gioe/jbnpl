@@ -13,6 +13,7 @@ const morgan = require('morgan');
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const mxRoutes = require("./routes/mx");
+const membershipRoutes = require("./routes/membership");
 
 // apiDocs
 app.get('/', (req, res) => {
@@ -47,6 +48,7 @@ app.use(cors());
 app.use('/', authRoutes);
 app.use('/', userRoutes);
 app.use('/', mxRoutes);
+app.use('/', membershipRoutes);
 
 app.use(function (err, req, res) {
     if (err.name === 'UnauthorizedError') {

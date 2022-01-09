@@ -26,18 +26,6 @@ exports.hasAuthorization = (req, res) => {
         })
     }
 }
-
-exports.allUsers = (req, res) => {
-    User.find((err, users) => {
-        if (err) {
-            return res.status(400).json({
-                error: err
-            });
-        }
-        res.json(users);
-    }).select("name email updated created")
-}
-
 exports.getUser = (req, res) => {
     req.profile.hashed_password = undefined;
     req.profile.salt = undefined;
@@ -49,19 +37,9 @@ exports.updateUser = (req, res) => {
     let form = new formidable.IncomingForm();
     form.keepExtensions = true;
     form.parse(req, (error, fields, files) => {
-        if (err) {
-            return res.status(400).json({
-                error: "Photo could not be uploaded"
-            });
-        }
         let user = req.profile
         user = _.extend(user, fields);
         user.upated = Date.now();
-        if (files.photo) {
-            user.photo.date = fs.readFileSync(files.photo.path)
-            user.photo.contentType = files.photo.type
-        }
-
         user.save((err) => {
             if (err) {
                 return res.status(400).json({
