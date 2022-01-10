@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { authenticate, signup } from "./api/auth";
+import {useCookies} from "react-cookie";
 
 function Copyright(props: any) {
     return (
@@ -33,6 +34,7 @@ export default function SignUp() {
 
     const [error, setErrorMessage] = React.useState('');
     const [redirectToReferer, setRedirectToReferer] = React.useState(false);
+    const [cookies, setCookie, removeCookie] = useCookies(['jwt']);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -46,9 +48,8 @@ export default function SignUp() {
                 if (data.error) {
                     setErrorMessage(data.error)
                 } else {
-                    authenticate(data, () => {
-                        router.push('/home')
-                    })
+                    setCookie('jwt', JSON.stringify(data), { path: '/', maxAge: 3600, sameSite: true });
+                    router.push('/home')
                 }
             })
     };
