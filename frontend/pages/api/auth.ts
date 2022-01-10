@@ -4,7 +4,7 @@ import { useCookies } from 'react-cookie';
 import {GetServerSidePropsContext} from "next";
 
 export const signup = (user: User) => {
-    return fetch(`${process.env.API_URL}/signup`,{
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/signup`,{
         method: "POST",
         headers: {
             Accept: 'application/json"',
@@ -19,7 +19,7 @@ export const signup = (user: User) => {
 }
 
 export const login = (user: User) => {
-    return fetch(`${process.env.API_URL}/login`,{
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`,{
         method: "POST",
         headers: {
             Accept: 'application/json"',
@@ -36,7 +36,7 @@ export const login = (user: User) => {
 export const logout = (next: () => void) => {
     if(typeof window !== "undefined") localStorage.removeItem("jwt")
     next()
-    return fetch(`${process.env.API_URL}/logout`, {
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
         method: "GET"
     })
         .then(response => {
