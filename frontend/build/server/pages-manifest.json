@@ -1,7 +1,13 @@
 {
   "/_app": "pages/_app.js",
+  "/about": "pages/about.html",
+  "/api/auth": "pages/api/auth.js",
+  "/api/mxClient": "pages/api/mxClient.js",
+  "/credentials": "pages/credentials.html",
+  "/home": "pages/home.js",
+  "/": "pages/index.html",
+  "/signup": "pages/signup.html",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/signup": "pages/signup.js",
-  "/home": "pages/home.js"
+  "/404": "pages/404.html"
 }
