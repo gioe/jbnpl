@@ -10,7 +10,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { authenticate, signup } from "./api/auth";
+import {authenticate, login, signup} from "./api/auth";
 import {useCookies} from "react-cookie";
 
 function Copyright(props: any) {
@@ -48,10 +48,16 @@ export default function SignUp() {
                 if (data.error) {
                     setErrorMessage(data.error)
                 } else {
-                    setCookie('jwt', JSON.stringify(data), { path: '/', maxAge: 3600, sameSite: true });
-                    router.push('/home')
+                    return login({name, email, password})
                 }
-            })
+            }).then(data => {
+            if (data.error) {
+                setErrorMessage(data.error)
+            } else {
+                setCookie('jwt', JSON.stringify(data), { path: '/', maxAge: 3600, sameSite: true });
+                router.push('/home')
+            }
+        })
     };
 
     return <ThemeProvider theme={theme}>
