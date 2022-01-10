@@ -33,16 +33,16 @@ import { parseMemberships, parseTransactions, parseAccounts } from "../helpers/m
 
 const menuItems = [
     {
+        text: "Search",
+        icon: <SearchIcon />,
+    },
+    {
         text: "Transactions",
         icon: <AttachMoneyIcon />,
     },
     {
         text: "Accounts",
         icon: <AccountBalanceIcon />,
-    },
-    {
-        text: "Search",
-        icon: <SearchIcon />,
     },
     {
         text: "Connections",

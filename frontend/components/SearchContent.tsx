@@ -7,7 +7,6 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import InstitutionCard from './InstitutionSearchCard';
 import { CredentialRequest, Credentials, Institution, MembershipRequest, Membership } from "../helpers/types";
-import SearchInput from 'react-search-input'
 import ReactModal from 'react-modal';
 import {isAuthenticated} from "../pages/api/auth";
 import {establishMembership, fetchInstitutionCredentials} from "../pages/api/mxClient";
@@ -53,6 +52,7 @@ function Content(props: SearchProps) {
     const [error, setError] = React.useState(false);
     const [credentialRequests, setCredentialRequests] = React.useState(initialState.credentialRequests);
     const [submitButtonDisabled, setSubmitButtonDisabled] = React.useState(true);
+    const [searchInput, setSearchInput] = React.useState("");
 
     const handleChange = (event: any) => {
         const id = event.target.id
@@ -130,6 +130,9 @@ function Content(props: SearchProps) {
             })
     }
 
+    const BarStyling = {width:"20rem",background:"#F2F1F9", border:"none", padding:"0.5rem"};
+
+
     return <ThemeProvider theme={theme}>
         <CssBaseline />
         <AppBar position="relative">
@@ -137,13 +140,16 @@ function Content(props: SearchProps) {
             </Toolbar>
         </AppBar>
         <Container sx={{ py: 8 }}>
-            <SearchInput
-                    style={
-                    {
-                        height: '50px',
-                    }}
-                    className="search-input"
-                    onChange={props.onSearch} />
+            <input
+                style={BarStyling}
+                key="random1"
+                value={searchInput}
+                placeholder={"Search banking institutions"}
+                onChange={(e) => {
+                    setSearchInput(e.target.value)
+                    props.onSearch(e.target.value)
+                }}
+            />
         </Container>
         <Container sx={{ py: 8 }} maxWidth="md">
             <ReactModal
