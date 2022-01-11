@@ -49,7 +49,7 @@ exports.getInstitutionCredentials = async (req, res) => {
 }
 
 exports.establishMembership = async (req, res) => {
-    const userGuid = req.body.userGuid
+    const userGuid = req.params.userGuid
     const credentials = req.body.credentials
     const institutionCode = req.body.institutionCode
 
@@ -78,14 +78,14 @@ exports.establishMembership = async (req, res) => {
         }
     })
 
-    Membership.find((err, memberships) => {
+    Membership.find({user_guid: userGuid}, function (err, memberships) {
         if (err) {
             return res.status(400).json({
                 error: err
             });
         }
         res.json({response: memberships});
-    }).select("is_authenticated connection_status successfully_aggregated_at is_being_aggregated aggregated_at name institution_code guid")
+    }).select("guid institution_code name aggregated_at is_being_aggregated successfully_aggregated_at connection_status is_authenticated user_guid")
 }
 
 exports.listAccounts = async (req, res) => {
@@ -126,7 +126,7 @@ updateMembership = async (membershipGuid, userGuid, requestBody) => {
 }
 
 exports.updateMembershipCredentials = async (req, res) => {
-    const userGuid = req.body.userGuid
+    const userGuid = req.params.userGuid
     const memberGuid = req.body.memberGuid
     const credentials = req.body.credentials
 
