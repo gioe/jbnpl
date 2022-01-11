@@ -4,16 +4,20 @@ import Box from '@mui/material/Box';
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import { Membership } from '../helpers/types';
+import {CredentialRequest, Membership} from '../helpers/types';
 import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {aggregateMembership} from "../pages/api/mxClient";
+import {ConnectionStatus} from "../helpers/userEnums";
+
 
 interface MembershipCardProps {
     membership: Membership;
+    onMultifactorAuth: (membership: Membership) => void;
+    onAuthenticate: (membership: Membership) => void;
 }
 
-export default function MembershipCard({membership}: MembershipCardProps) {
+export default function MembershipCard({membership, onMultifactorAuth, onAuthenticate}: MembershipCardProps) {
 
     const [loading, setLoading] = React.useState(false);
 
@@ -21,17 +25,18 @@ export default function MembershipCard({membership}: MembershipCardProps) {
         setLoading(true)
         aggregateMembership(membership.userGuid, membership.guid)
             .then(data => {
-                console.log(data)
                 setLoading(false)
             })
     }
 
-    const authenticate = () => {
-
-
+    const handleMultifactorAuth = () => {
+        onMultifactorAuth(membership)
     }
 
-    console.log(membership)
+    const authenticate = () => {
+        onAuthenticate(membership)
+    }
+
     return (
         <Grid item key={membership.name}>
             <Card sx={{ display: 'flex' }}>
@@ -43,6 +48,13 @@ export default function MembershipCard({membership}: MembershipCardProps) {
                         <Typography component="div">
                             Connection Status: {membership.connectionStatus}
                         </Typography>
+                        {membership.connectionStatus == ConnectionStatus.CREATED ?
+                            <Button
+                                onClick={handleMultifactorAuth}
+                                variant="outlined">
+                                2FA
+                            </Button> : <></>
+                        }
                         <Typography component="div">
                             Is Being Aggregated: {membership.isBeingAggregated ? "Yes" : "No"}
                         </Typography>

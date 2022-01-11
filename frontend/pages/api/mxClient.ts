@@ -1,4 +1,4 @@
-import {Institution, MembershipRequest} from "../../helpers/types";
+import {CredentialsUpdateRequest, MembershipRequest} from "../../helpers/types";
 import {isAuthenticated} from "./auth";
 
 export const searchInstitutions = (searchTerm: string) => {
@@ -15,8 +15,8 @@ export const searchInstitutions = (searchTerm: string) => {
         .catch(err => console.log(err))
 }
 
-export const fetchInstitutionCredentials = (institution: Institution) => {
-    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/mx/institution/credentials/${institution.code}`,{
+export const fetchInstitutionCredentials = (institutionCode: string) => {
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/mx/institution/credentials/${institutionCode}`,{
         method: "GET",
         headers: {
             Accept: "application/json",
@@ -30,8 +30,7 @@ export const fetchInstitutionCredentials = (institution: Institution) => {
 }
 
 export const establishMembership = (membershipRequest: MembershipRequest) => {
-    console.log(membershipRequest)
-    const userId = isAuthenticated().user._id
+    const userId = isAuthenticated().user.mxId
     return fetch(`${process.env.NEXT_PUBLIC_API_URL}/mx/membership/${userId}/`,{
         method: "POST",
         headers: {
@@ -46,16 +45,15 @@ export const establishMembership = (membershipRequest: MembershipRequest) => {
         .catch(err => console.log(err))
 }
 
-export const updateMembership = (membershipRequest: MembershipRequest) => {
-    const userId = isAuthenticated().user._id
-
-    return fetch(`${process.env.NEXT_PUBLIC_API_URL}'/user/${userId}/members/${userId}'/`,{
+export const updateMembershipCredentials = (updateRequest: CredentialsUpdateRequest) => {
+    const mxId = isAuthenticated().user.mxId
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/memberships/${mxId}/`,{
         method: "PUT",
         headers: {
             Accept: "application/json",
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(membershipRequest)
+        body: JSON.stringify(updateRequest)
     })
         .then(response => {
             return response.json()

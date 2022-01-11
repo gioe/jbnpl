@@ -54,6 +54,7 @@ export default function SignUp() {
             if (data.error) {
                 setErrorMessage(data.error)
             } else {
+                authenticate(data)
                 setCookie('jwt', JSON.stringify(data), { path: '/', maxAge: 3600, sameSite: true });
                 router.push('/home')
             }

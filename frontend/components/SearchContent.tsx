@@ -8,13 +8,11 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import InstitutionCard from './InstitutionSearchCard';
 import { CredentialRequest, Credentials, Institution, MembershipRequest, Membership } from "../helpers/types";
 import ReactModal from 'react-modal';
-import {isAuthenticated} from "../pages/api/auth";
 import {establishMembership, fetchInstitutionCredentials} from "../pages/api/mxClient";
 import Stack from '@mui/material/Stack';
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Button from "@mui/material/Button";
-import {ConnectionStatus} from "../helpers/userEnums";
 
 const theme = createTheme();
 
@@ -65,7 +63,7 @@ function Content(props: SearchProps) {
     }
 
     const selectInstitution = (institution: Institution) => {
-        fetchInstitutionCredentials(institution)
+        fetchInstitutionCredentials(institution.code)
             .then(data => {
                 const credentials = data.response.credentials.map((value: { field_name: string; guid: string; label: string; display_order: number; field_type: string; }) => {
                     return {
@@ -98,7 +96,6 @@ function Content(props: SearchProps) {
     const submitCredentials = () => {
         setLoading(true)
         const request = {
-            userGuid: isAuthenticated().user.mxId,
             institutionCode: selectedInstitutionCode,
             credentials: credentialRequests,
         } as MembershipRequest

@@ -73,8 +73,12 @@ export type CredentialRequest = {
     value: string;
 }
 
+export type CredentialsUpdateRequest = {
+    memberGuid: string;
+    credentials: CredentialRequest[];
+}
+
 export type MembershipRequest = {
-    userGuid: string;
     institutionCode: string;
     credentials: CredentialRequest[];
 }

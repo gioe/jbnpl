@@ -10,7 +10,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {login} from "./api/auth";
+import {authenticate, login} from "./api/auth";
 import { useCookies } from 'react-cookie';
 
 function Copyright(props: any) {
@@ -42,9 +42,11 @@ const SignupPage = () => {
 
         login({name, email, password})
             .then(data => {
+                console.log(data)
                 if (data.error) {
                     setErrorMessage(data.error)
                 } else {
+                    authenticate(data)
                     setCookie('jwt', JSON.stringify(data), { path: '/', maxAge: 3600, sameSite: true });
                     router.push('/home')
                 }

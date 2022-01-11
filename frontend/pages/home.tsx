@@ -179,8 +179,9 @@ function Content(props: ContentProps) {
 }
 
 const Home = (props: HomeProps) => {
+    console.log(props)
     const [open, setOpen] = React.useState(true);
-    const [contentType, setContentType] = React.useState("Transactions");
+    const [contentType, setContentType] = React.useState("Search");
     const [memberships, setMemberships] = React.useState(props.memberships)
     const [accounts, setAccounts] = React.useState(props.accounts)
     const [transactions, setTransactions] = React.useState(props.transactions)
@@ -286,7 +287,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const fetchedMemberships = await refreshMemberships(mxId)
     const fetchedAccounts = await getAllAccounts(mxId)
     const fetchedTransactions = await getAllTransactions(mxId, 1)
-
     return {
         props: {
             memberships: parseMemberships(fetchedMemberships),
