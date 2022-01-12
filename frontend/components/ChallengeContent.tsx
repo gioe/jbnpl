@@ -64,13 +64,13 @@ export default function ChallengeContent({memberGuid, challenges, closeChallenge
         switch (challenge.type) {
             case "TEXT":
                 return (
-                    <>
-                        <Typography>{challenge.label}</Typography>
-                        <TextField key={challenge.type}
+                    <div key={challenge.guid}>
+                        <Typography key={challenge.guid}>{challenge.label}</Typography>
+                        <TextField key={challenge.guid}
                                           id={challenge.guid}
                                           variant="outlined"
                                           onChange={handleChange}/>
-                    </>
+                    </div>
                 )
             default:
                 return <></>
@@ -78,15 +78,7 @@ export default function ChallengeContent({memberGuid, challenges, closeChallenge
     }
 
     return (
-        <Stack
-            component="form"
-            sx={{
-                width: '25ch',
-            }}
-            spacing={2}
-            noValidate
-            autoComplete="off"
-        >
+        <>
             {challenges.map(challenge => {
                 return fieldForChallenge(challenge)
             })}
@@ -103,6 +95,6 @@ export default function ChallengeContent({memberGuid, challenges, closeChallenge
                     onClick={closeChallengeModal}>
                 Cancel
             </Button>
-        </Stack>
+        </>
     );
 }

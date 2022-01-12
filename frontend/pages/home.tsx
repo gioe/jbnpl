@@ -18,19 +18,14 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import {ListItem, ListItemIcon, ListItemText} from "@mui/material";
 import SearchContent from '../components/SearchContent';
-import {Account, Institution, Membership, Transaction} from '../helpers/types';
-import {
-    searchInstitutions,
-    getAllAccounts,
-    getAllTransactions,
-    refreshMemberships
-} from "./api/mxClient";
 import ConnectionsContent from "../components/ConnectionsContent";
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TransactionsContent from "../components/TransactionsContent";
 import { cookiesAreAuthenticated} from "./api/auth";
-import { parseMemberships, parseTransactions, parseAccounts } from "../helpers/modelParsers";
 
+interface ContentProps {
+    contentType: string;
+}
 const menuItems = [
     {
         text: "Search",
@@ -52,30 +47,8 @@ const menuItems = [
 
 const drawerWidth: number = 240;
 
-interface State {
-    institutions: Institution[];
-}
-
-const initialState: State = {
-    institutions: [],
-}
-
 interface AppBarProps extends MuiAppBarProps {
     open?: boolean;
-}
-
-interface ContentProps {
-    contentType: string;
-    memberships: Membership[];
-    accounts: Account[];
-    transactions: Transaction[];
-    handleFetchedMemberships: (fetchedMemberships: Membership[]) => void;
-}
-
-interface HomeProps {
-    memberships: Membership[];
-    accounts: Account[];
-    transactions: Transaction[];
 }
 
 const AppBar = styled(MuiAppBar, {
@@ -126,73 +99,27 @@ const mdTheme = createTheme();
 
 function Content(props: ContentProps) {
 
-    const [institutions, setInstitutions] = React.useState(initialState.institutions)
-    const [error, setErrorMessage] = React.useState('');
-
-    const handleSearch = (searchTerm: string) => {
-        if (searchTerm == '') {
-            setInstitutions([])
-        } else {
-            searchInstitutions(searchTerm)
-                .then(data => {
-                    if (data.error) {
-                        setErrorMessage(data.error)
-                    } else {
-                        const membershipKeys = props.memberships.map(membership => {
-                            return membership.name
-                        })
-                        const searchResults = data.results.institutions.map((value: { code: string; name: string; small_logo_url: string; medium_logo_url: string; url: string; supports_account_identification: boolean; supports_account_statement: boolean; supports_account_verification: boolean; supports_oauth: boolean; supports_transaction_history: boolean; }) => {
-                            return {
-                                code: value.code,
-                                name: value.name,
-                                logoUrlSmall: value.small_logo_url,
-                                logoUrlMedium: value.medium_logo_url,
-                                url: value.url,
-                                supportsAccountIdentification: value.supports_account_identification,
-                                supportsAccountStatement: value.supports_account_statement,
-                                supportsAccountVerification: value.supports_account_verification,
-                                supportsOauth: value.supports_oauth,
-                                supportsTransactionHistory: value.supports_transaction_history,
-                            }
-                        }).filter((value: { name: string; }) => {
-                            return !membershipKeys.includes(value.name)
-                        })
-
-                        setInstitutions([...searchResults])
-                    }
-                })
-        }
-    }
-
     switch (props.contentType) {
         case "Connections":
-            return <ConnectionsContent memberships={props.memberships}/>
+            return <ConnectionsContent />
         case "Search":
-            return <SearchContent searchResults={institutions} onSearch={handleSearch} handleFetchedMemberships={props.handleFetchedMemberships}/>
+            return <SearchContent />
         case "Accounts":
-            return <AccountsContent accounts={props.accounts} />
+            return <AccountsContent />
         case "Transactions":
-            return <TransactionsContent transactions={props.transactions} />
+            return <TransactionsContent />
         default:
             return <> </>;
     }
 }
 
-const Home = (props: HomeProps) => {
+const Home = () => {
     const [open, setOpen] = React.useState(true);
     const [contentType, setContentType] = React.useState("Search");
-    const [memberships, setMemberships] = React.useState(props.memberships)
-    const [accounts, setAccounts] = React.useState(props.accounts)
-    const [transactions, setTransactions] = React.useState(props.transactions)
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
-
-    const handleFetchedMemberships = (memberships: Membership[]) => {
-        setContentType("Integrations")
-        setMemberships([...memberships])
-    }
 
     return (
         <ThemeProvider theme={mdTheme}>
@@ -255,12 +182,7 @@ const Home = (props: HomeProps) => {
                     </List>
                 </Drawer>
                 <Box>
-                    <Content
-                        contentType={contentType}
-                        memberships={memberships}
-                        accounts={accounts}
-                        transactions={transactions}
-                        handleFetchedMemberships={handleFetchedMemberships}/>
+                    <Content contentType={contentType}/>
                 </Box>
             </Box>
         </ThemeProvider>
@@ -282,15 +204,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
     }
 
-    const mxId = JSON.parse(context.req.cookies.jwt).user.mxId
-    const fetchedMemberships = await refreshMemberships(mxId)
-    const fetchedAccounts = await getAllAccounts(mxId)
-    const fetchedTransactions = await getAllTransactions(mxId, 1)
     return {
-        props: {
-            memberships: parseMemberships(fetchedMemberships),
-            accounts: parseAccounts(fetchedAccounts.response),
-            transactions: parseTransactions(fetchedTransactions.response),
-        },
+        props:{},
     };
 };

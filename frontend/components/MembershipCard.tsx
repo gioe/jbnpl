@@ -12,11 +12,9 @@ import {ConnectionStatus} from "../helpers/userEnums";
 
 interface MembershipCardProps {
     membership: Membership;
-    onMultifactorAuth: (membership: Membership) => void;
-    onAuthenticate: (membership: Membership) => void;
 }
 
-export default function MembershipCard({membership, onMultifactorAuth, onAuthenticate}: MembershipCardProps) {
+export default function MembershipCard({membership}: MembershipCardProps) {
 
     const [syncing, setSyncing] = React.useState(false);
 
@@ -24,21 +22,11 @@ export default function MembershipCard({membership, onMultifactorAuth, onAuthent
         setSyncing(true)
         aggregateMembership(membership.userGuid, membership.guid)
             .then(data => {
-                console.log(data)
                 setSyncing(false)
             })
     }
 
-    const handleMultifactorAuth = () => {
-        onMultifactorAuth(membership)
-    }
-
-    const authenticate = () => {
-        onAuthenticate(membership)
-    }
-
     const mapConnectionStatus = (membership: Membership) => {
-        console.log(membership.connectionStatus)
         switch (membership.connectionStatus) {
             case ConnectionStatus.CHALLENGED:
                 return "2FA Required"
@@ -46,23 +34,6 @@ export default function MembershipCard({membership, onMultifactorAuth, onAuthent
                 return "OK"
             default:
                 return membership.isAuthenticated ? "Authentication Failed" : membership.connectionStatus
-        }
-    }
-
-    const connectionCta = (membership: Membership) => {
-        switch (membership.connectionStatus) {
-            case ConnectionStatus.CHALLENGED:
-                return <Button
-                    onClick={handleMultifactorAuth}
-                    variant="outlined">
-                    2FA
-                </Button>
-            default:
-                return membership.isAuthenticated ? <Button
-                onClick={authenticate}
-                variant="outlined">
-                Authenticate
-                </Button> : <></>
         }
     }
 
@@ -87,7 +58,6 @@ export default function MembershipCard({membership, onMultifactorAuth, onAuthent
                         <Typography component="div">
                             Bank Connection Status: {mapConnectionStatus(membership)}
                         </Typography>
-                        {connectionCta(membership)}
                         <Typography component="div">
                             Bank Data Last Synchronized: {determineSyncDate(membership.successfullyAggregatedAt)}
                         </Typography>

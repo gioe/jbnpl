@@ -12,6 +12,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {authenticate, login, signup} from "./api/auth";
 import {useCookies} from "react-cookie";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 function Copyright(props: any) {
     return (
@@ -34,17 +35,39 @@ export default function SignUp() {
 
     const [error, setErrorMessage] = React.useState('');
     const [redirectToReferer, setRedirectToReferer] = React.useState(false);
+    const [signingUp, setSigningUp] = React.useState(false);
     const [cookies, setCookie, removeCookie] = useCookies(['jwt']);
+    const [lastName, setLastName] = React.useState("");
+    const [firstName, setFirstName] = React.useState("");
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const name = formData.get('firstName') as string + ' ' +  formData.get('lastName') as string
-        const email = formData.get('email') as string
-        const password = formData.get('password') as string
+    const handleTextInput = (event: any) => {
+        const id = event.target.id
+        const value = event.target.value
 
+        switch (id) {
+            case "password":
+                setPassword(value)
+                break
+            case "email":
+                setEmail(value)
+                break
+            case "lastName":
+                setLastName(value)
+                break
+            default:
+                setFirstName(value)
+                break
+        }
+    }
+
+    const signupUser = () => {
+        setSigningUp(true)
+        const name = firstName + ' ' +  lastName
         signup({name, email, password})
             .then(data => {
+                setSigningUp(false)
                 if (data.error) {
                     setErrorMessage(data.error)
                 } else {
@@ -59,7 +82,7 @@ export default function SignUp() {
                 router.push('/home')
             }
         })
-    };
+    }
 
     return <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
@@ -77,7 +100,7 @@ export default function SignUp() {
                     <Typography component="h1" variant="h5">
                         Sign up
                     </Typography>
-                    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                    <Box sx={{ mt: 3 }}>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>
                                 <TextField
@@ -87,6 +110,7 @@ export default function SignUp() {
                                     fullWidth
                                     id="firstName"
                                     label="First Name"
+                                    onChange={handleTextInput}
                                     autoFocus
                                 />
                             </Grid>
@@ -98,6 +122,7 @@ export default function SignUp() {
                                     label="Last Name"
                                     name="lastName"
                                     autoComplete="family-name"
+                                    onChange={handleTextInput}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -108,6 +133,7 @@ export default function SignUp() {
                                     label="Email Address"
                                     name="email"
                                     autoComplete="email"
+                                    onChange={handleTextInput}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -119,17 +145,17 @@ export default function SignUp() {
                                     type="password"
                                     id="password"
                                     autoComplete="new-password"
+                                    onChange={handleTextInput}
                                 />
                             </Grid>
                         </Grid>
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
+                        <LoadingButton onClick={signupUser}
+                                       loading={signingUp}
+                                       loadingIndicator="Signing In..."
+                                       variant="contained"
+                                       fullWidth>
                             Sign Up
-                        </Button>
+                        </LoadingButton>
                         <Grid container justifyContent="flex-end">
                             <Grid item>
                                 <Link href="#" variant="body2">

@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from 'next/router';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
@@ -12,6 +12,10 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {authenticate, login} from "./api/auth";
 import { useCookies } from 'react-cookie';
+import ConnectionsContent from "../components/ConnectionsContent";
+import SearchContent from "../components/SearchContent";
+import AccountsContent from "../components/AccountsContent";
+import TransactionsContent from "../components/TransactionsContent";
 
 function Copyright(props: any) {
     return (
@@ -31,18 +35,30 @@ const theme = createTheme();
 const SignupPage = () => {
     const router = useRouter();
     const [error, setErrorMessage] = React.useState('');
+    const [signingIn, setSigningIn] = React.useState(false);
     const [cookies, setCookie, removeCookie] = useCookies(['jwt']);
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const handleTextInput = (event: any) => {
+        const id = event.target.id
+        const value = event.target.value
+
+        switch (id) {
+            case "password":
+                setPassword(value)
+                break
+            default:
+                setEmail(value)
+        }
+    }
+
+    const signIn = () => {
         const name = null;
-        const formData = new FormData(event.currentTarget);
-        const email = formData.get('email') as string
-        const password = formData.get('password') as string
-
+        setSigningIn(true)
         login({name, email, password})
             .then(data => {
-                console.log(data)
+                setSigningIn(false)
                 if (data.error) {
                     setErrorMessage(data.error)
                 } else {
@@ -51,7 +67,7 @@ const SignupPage = () => {
                     router.push('/home')
                 }
             })
-    };
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -86,7 +102,7 @@ const SignupPage = () => {
                         <Typography component="h1" variant="h5">
                             Sign in
                         </Typography>
-                        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                        <Box sx={{ mt: 1 }}>
                             <TextField
                                 margin="normal"
                                 required
@@ -95,6 +111,7 @@ const SignupPage = () => {
                                 label="Email Address"
                                 name="email"
                                 autoComplete="email"
+                                onChange={handleTextInput}
                                 autoFocus
                             />
                             <TextField
@@ -106,15 +123,15 @@ const SignupPage = () => {
                                 type="password"
                                 id="password"
                                 autoComplete="current-password"
+                                onChange={handleTextInput}
                             />
-                            <Button
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                sx={{ mt: 3, mb: 2 }}
-                            >
+                            <LoadingButton onClick={signIn}
+                                           loading={signingIn}
+                                           loadingIndicator="Signing In..."
+                                           variant="contained"
+                                           fullWidth>
                                 Sign In
-                            </Button>
+                            </LoadingButton>
                             <Grid container>
                                 <Grid item>
                                     <Link href="/signup" variant="body2">

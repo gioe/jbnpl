@@ -29,22 +29,6 @@ export const fetchInstitutionCredentials = (institutionCode: string) => {
         .catch(err => console.log(err))
 }
 
-export const establishMembership = (membershipRequest: MembershipRequest) => {
-    const userId = isAuthenticated().user.mxId
-    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/mx/membership/${userId}/`,{
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(membershipRequest)
-    })
-        .then(response => {
-            return response.json()
-        })
-        .catch(err => console.log(err))
-}
-
 export const updateMembershipCredentials = (updateRequest: CredentialsUpdateRequest) => {
     const mxId = isAuthenticated().user.mxId
     return fetch(`${process.env.NEXT_PUBLIC_API_URL}/memberships/${mxId}/`,{
@@ -157,6 +141,20 @@ export const resumeAggregation = (responses: ChallengeResponse[], memberGuid: st
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(responses)
+    })
+        .then(response => {
+            return response.json()
+        })
+        .catch(err => console.log(err))
+}
+
+export const getConnectWidget = (userGuid: string) => {
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/widget/${userGuid}`,{
+        method: "POST",
+        headers: {
+            Accept: "application/json",
+            'Content-Type': 'application/json',
+        },
     })
         .then(response => {
             return response.json()

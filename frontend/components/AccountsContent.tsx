@@ -10,6 +10,10 @@ import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import { AccountType } from "../helpers/accountEnums";
+import {useEffect, useState} from "react";
+import {isAuthenticated} from "../pages/api/auth";
+import {getAllAccounts} from "../pages/api/mxClient";
+import { parseAccounts } from '../helpers/modelParsers';
 
 const theme = createTheme();
 
@@ -72,6 +76,20 @@ function Content(props: AccountProps) {
     </ThemeProvider>;
 }
 
-export default function AccountsContent(props: AccountProps) {
-    return <Content accounts={props.accounts}/>;
+export default function AccountsContent() {
+
+    const [accounts, setAccounts] = React.useState<Account[]>([])
+
+    useEffect(()=>{
+        const fetchAccounts = async () => {
+            const userGuid = isAuthenticated().user.mxId
+            const accounts = await getAllAccounts(userGuid)
+            return parseAccounts(accounts.response)
+        }
+        fetchAccounts().then(accounts => {
+            setAccounts(accounts)
+        })
+    }, []);
+
+    return <Content accounts={accounts}/>;
 }

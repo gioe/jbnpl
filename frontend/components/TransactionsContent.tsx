@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Transaction} from "../helpers/types";
+import {Membership, Transaction} from "../helpers/types";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
@@ -12,6 +12,10 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Typography from "@mui/material/Typography";
+import {useEffect} from "react";
+import {isAuthenticated} from "../pages/api/auth";
+import {getAllTransactions} from "../pages/api/mxClient";
+import {parseTransactions} from "../helpers/modelParsers";
 
 const theme = createTheme();
 
@@ -86,6 +90,21 @@ function Content(props: TransactionsProps) {
     </ThemeProvider>;
 }
 
-export default function TransactionsContent(props: TransactionsProps) {
-    return <Content transactions={props.transactions}/>;
+export default function TransactionsContent() {
+
+    const [transactions, setTransactions] = React.useState<Transaction[]>([])
+
+    useEffect(()=>{
+        const fetchTransactions = async () => {
+            const userGuid = isAuthenticated().user.mxId
+            const transactions = await getAllTransactions(userGuid, 1)
+            return parseTransactions(transactions.response)
+        }
+        fetchTransactions().then(transactions => {
+            setTransactions(transactions)
+        })
+    }, []);
+
+
+    return <Content transactions={transactions}/>;
 }
