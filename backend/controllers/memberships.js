@@ -33,7 +33,7 @@ exports.getAllMemberships = async (req, res) => {
             });
         }
         res.json({response: memberships});
-    }).select("guid institution_code name aggregated_at is_being_aggregated successfully_aggregated_at connection_status is_authenticated user_guid")
+    }).select("guid institution_code name aggregated_at successfully_aggregated_at connection_status is_authenticated user_guid")
 }
 
 const getMembershipStatuses = async (memberships) => {
@@ -41,7 +41,6 @@ const getMembershipStatuses = async (memberships) => {
         const response = await mxClient.readMemberStatus(membership.guid, membership.user_guid);
         Membership.findByIdAndUpdate(membership.id, {
             aggregated_at: response.data.member.aggregated_at,
-            is_being_aggregated: response.data.member.is_being_aggregated,
             successfully_aggregated_at: response.data.member.successfully_aggregated_at,
             is_authenticated: response.data.member.is_authenticated,
             connection_status: response.data.member.connection_status
@@ -54,11 +53,26 @@ const getMembershipStatuses = async (memberships) => {
 }
 
 exports.aggregateMembership = async (req, res) => {
-
-    const memberGuid = req.body.memberGuid
-    const userGuid = req.body.userGuid
+    const memberGuid = req.params.memberGuid
+    const userGuid = req.params.userGuid
 
     const response = await mxClient.aggregateMember(memberGuid, userGuid);
-    res.json({response});
+    res.json({response: response.data});
+}
 
+exports.resumeAggregation = async (req, res) => {
+    const memberGuid = req.params.memberGuid
+    const userGuid = req.params.userGuid
+
+    const requestBody = {
+        member: {
+            challenges: req.body
+        }
+    };
+
+    const response = await mxClient.resumeAggregation(memberGuid, userGuid, requestBody);
+    console.log(response)
+    const statusResponse = await mxClient.readMemberStatus(memberGuid, userGuid);
+    console.log(statusResponse)
+    res.json({response: statusResponse.data })
 }

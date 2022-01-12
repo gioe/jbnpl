@@ -106,11 +106,10 @@ function Content(props: SearchProps) {
                     setError(true)
                     setLoading(false)
                 } else {
-                    const memberships = data.response.map((value: { user_guid: string; guid: any; aggregated_at: any; is_being_aggregated: any; successfully_aggregated_at: any; connection_status: any; is_authenticated: any; name: any; institution_code: any; }) => {
+                    const memberships = data.response.map((value: { user_guid: string; guid: any; aggregated_at: any; successfully_aggregated_at: any; connection_status: any; is_authenticated: any; name: any; institution_code: any; }) => {
                         return {
                             guid: value.guid,
                             aggregatedAt: value.aggregated_at,
-                            isBeingAggregated: value.is_being_aggregated,
                             successfullyAggregatedAt: value.successfully_aggregated_at,
                             connectionStatus: value.connection_status,
                             isAuthenticated: value.is_authenticated,

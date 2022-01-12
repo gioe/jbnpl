@@ -179,7 +179,6 @@ function Content(props: ContentProps) {
 }
 
 const Home = (props: HomeProps) => {
-    console.log(props)
     const [open, setOpen] = React.useState(true);
     const [contentType, setContentType] = React.useState("Search");
     const [memberships, setMemberships] = React.useState(props.memberships)

@@ -14,9 +14,6 @@ const membershipSchema = new mongoose.Schema({
     aggregated_at: {
         type: String,
     },
-    is_being_aggregated: {
-        type: Boolean,
-    },
     successfully_aggregated_at: {
         type: String,
     },

@@ -85,7 +85,7 @@ exports.establishMembership = async (req, res) => {
             });
         }
         res.json({response: memberships});
-    }).select("guid institution_code name aggregated_at is_being_aggregated successfully_aggregated_at connection_status is_authenticated user_guid")
+    }).select("guid institution_code name aggregated_at successfully_aggregated_at connection_status is_authenticated user_guid")
 }
 
 exports.listAccounts = async (req, res) => {
@@ -140,9 +140,10 @@ exports.updateMembershipCredentials = async (req, res) => {
 }
 
 exports.getMemberStatus = async (req, res) => {
-    const memberGuid = req.body.memberGuid
-    const userGuid = req.body.userGuid
+    const memberGuid = req.params.memberGuid
+    const userGuid = req.params.userGuid
 
     const response = await mxClient.readMemberStatus(memberGuid, userGuid);
+    console.log(response.data)
     res.json({ response: response.data });
 }

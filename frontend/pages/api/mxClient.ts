@@ -1,4 +1,4 @@
-import {CredentialsUpdateRequest, MembershipRequest} from "../../helpers/types";
+import {ChallengeResponse, CredentialsUpdateRequest, MembershipRequest} from "../../helpers/types";
 import {isAuthenticated} from "./auth";
 
 export const searchInstitutions = (searchTerm: string) => {
@@ -119,8 +119,9 @@ export const getAllTransactions = (mxId: string, page: number) => {
         .catch(err => console.log(err))
 }
 
-export const getMemberStatus = (mxId: string) => {
-    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${mxId}/members/${mxId}/status`,{
+export const getMemberStatus = (memberGuid: string) => {
+    const userGuid = isAuthenticated().user.mxId
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userGuid}/members/${memberGuid}/status`,{
         method: "GET",
         headers: {
             Accept: "application/json",
@@ -135,7 +136,7 @@ export const getMemberStatus = (mxId: string) => {
 
 export const aggregateMembership = (userGuid: string, memberGuid: string) => {
     return fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userGuid}/members/${memberGuid}/aggregate`,{
-        method: "GET",
+        method: "POST",
         headers: {
             Accept: "application/json",
             'Content-Type': 'application/json',
@@ -147,4 +148,18 @@ export const aggregateMembership = (userGuid: string, memberGuid: string) => {
         .catch(err => console.log(err))
 }
 
-
+export const resumeAggregation = (responses: ChallengeResponse[], memberGuid: string) => {
+    const userGuid = isAuthenticated().user.mxId
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userGuid}/members/${memberGuid}/aggregate`,{
+        method: "PUT",
+        headers: {
+            Accept: "application/json",
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(responses)
+    })
+        .then(response => {
+            return response.json()
+        })
+        .catch(err => console.log(err))
+}

@@ -10,14 +10,15 @@ import {
     Credentials,
     CredentialsUpdateRequest,
     Membership,
-    MembershipRequest
+    Challenge
 } from "../helpers/types";
 import ReactModal from 'react-modal';
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Button from "@mui/material/Button";
-import {fetchInstitutionCredentials, updateMembershipCredentials} from "../pages/api/mxClient";
+import {fetchInstitutionCredentials, getMemberStatus, updateMembershipCredentials} from "../pages/api/mxClient";
+import ChallengeContent from "./ChallengeContent";
 
 interface State {
     credentialRequests: CredentialRequest[];
@@ -46,6 +47,8 @@ interface Props {
 
 const Content: React.FC<Props> = (props) => {
 
+    const [memberships, setMemberships] = React.useState(props.memberships);
+    const [memberGuid, setMemberGuid] = React.useState("");
     const [loading, setLoading] = React.useState(false);
     const [showAuthModal, setShowAuthModal] = React.useState(false)
     const [showChallengeModal, setShowChallengeModal] = React.useState(false)
@@ -53,7 +56,16 @@ const Content: React.FC<Props> = (props) => {
     const [error, setError] = React.useState(false);
     const [credentialRequests, setCredentialRequests] = React.useState(initialState.credentialRequests);
     const [submitButtonDisabled, setSubmitButtonDisabled] = React.useState(true);
-    const [memberGuid, setMemberGuid] = React.useState("");
+    const [challenges, setChallenges] = React.useState<Challenge[]>([]);
+
+    const updateMember = (member: any) => {
+        const membershipIndex = memberships.findIndex(element => element.guid == member.guid)
+        memberships[membershipIndex].aggregatedAt = member.aggregated_at
+        memberships[membershipIndex].successfullyAggregatedAt = member.successfully_aggregated_at
+        memberships[membershipIndex].connectionStatus = member.connection_status
+        memberships[membershipIndex].isAuthenticated = member.is_authenticated
+        setMemberships([...memberships])
+    }
 
     const submitCredentials = () => {
         setLoading(true)
@@ -78,12 +90,30 @@ const Content: React.FC<Props> = (props) => {
         setCredentialRequests([...credentialRequests])
     }
 
-    const escape = () => {
+    const closeAuthModal = () => {
         setShowAuthModal(false)
     }
 
+    const closeChallengeModal = () => {
+        setShowChallengeModal(false)
+    }
+
     const handleMultfactorAuth = (membership: Membership) => {
-        setShowChallengeModal(true)
+        getMemberStatus(membership.guid).then(data => {
+            if (data.response.member.challenges) {
+                const parsedChallenges = data.response.member.challenges.map((value: any) => {
+                    return {
+                        fieldName: value.field_name,
+                        guid: value.guid,
+                        label: value.label,
+                        type: value.type
+                    }
+                })
+                setMemberGuid(membership.guid)
+                setChallenges(parsedChallenges)
+                setShowChallengeModal(true)
+            }
+        })
     }
 
     const handleAuthenticate = (membership: Membership) => {
@@ -107,7 +137,6 @@ const Content: React.FC<Props> = (props) => {
                 })
 
                 setCredentialRequests([...credentialRequests])
-                setMemberGuid(membership.guid)
                 setCredentials(credentials)
                 setShowAuthModal(true)
             })
@@ -156,7 +185,7 @@ const Content: React.FC<Props> = (props) => {
                         Submit
                     </LoadingButton>
                     <Button variant="outlined"
-                            onClick={escape}>
+                            onClick={closeAuthModal}>
                         Cancel
                     </Button>
                 </Stack>
@@ -175,6 +204,11 @@ const Content: React.FC<Props> = (props) => {
                 noValidate
                 autoComplete="off"
             >
+                <ChallengeContent memberGuid={memberGuid}
+                                  challenges={challenges}
+                                  closeChallengeModal={closeChallengeModal}
+                                  handleMemberUpdate={updateMember}
+                />
             </Stack>
         </ReactModal>
         <Box>

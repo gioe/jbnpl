@@ -10,7 +10,6 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import {aggregateMembership} from "../pages/api/mxClient";
 import {ConnectionStatus} from "../helpers/userEnums";
 
-
 interface MembershipCardProps {
     membership: Membership;
     onMultifactorAuth: (membership: Membership) => void;
@@ -19,13 +18,14 @@ interface MembershipCardProps {
 
 export default function MembershipCard({membership, onMultifactorAuth, onAuthenticate}: MembershipCardProps) {
 
-    const [loading, setLoading] = React.useState(false);
+    const [syncing, setSyncing] = React.useState(false);
 
     const aggregate = () => {
-        setLoading(true)
+        setSyncing(true)
         aggregateMembership(membership.userGuid, membership.guid)
             .then(data => {
-                setLoading(false)
+                console.log(data)
+                setSyncing(false)
             })
     }
 
@@ -37,6 +37,45 @@ export default function MembershipCard({membership, onMultifactorAuth, onAuthent
         onAuthenticate(membership)
     }
 
+    const mapConnectionStatus = (membership: Membership) => {
+        console.log(membership.connectionStatus)
+        switch (membership.connectionStatus) {
+            case ConnectionStatus.CHALLENGED:
+                return "2FA Required"
+            case ConnectionStatus.CONNECTED:
+                return "OK"
+            default:
+                return membership.isAuthenticated ? "Authentication Failed" : membership.connectionStatus
+        }
+    }
+
+    const connectionCta = (membership: Membership) => {
+        switch (membership.connectionStatus) {
+            case ConnectionStatus.CHALLENGED:
+                return <Button
+                    onClick={handleMultifactorAuth}
+                    variant="outlined">
+                    2FA
+                </Button>
+            default:
+                return membership.isAuthenticated ? <Button
+                onClick={authenticate}
+                variant="outlined">
+                Authenticate
+                </Button> : <></>
+        }
+    }
+
+    const determineSyncDate = (lastSyncDate: string) => {
+        if (lastSyncDate == null) {
+            return "Never"
+        } else {
+            const syncDate = lastSyncDate
+            const convertedDate = new Date(syncDate);
+            return convertedDate.toDateString()
+        }
+    }
+
     return (
         <Grid item key={membership.name}>
             <Card sx={{ display: 'flex' }}>
@@ -46,38 +85,20 @@ export default function MembershipCard({membership, onMultifactorAuth, onAuthent
                             {membership.name}
                         </Typography>
                         <Typography component="div">
-                            Connection Status: {membership.connectionStatus}
+                            Bank Connection Status: {mapConnectionStatus(membership)}
                         </Typography>
-                        {membership.connectionStatus == ConnectionStatus.CREATED ?
-                            <Button
-                                onClick={handleMultifactorAuth}
-                                variant="outlined">
-                                2FA
-                            </Button> : <></>
-                        }
+                        {connectionCta(membership)}
                         <Typography component="div">
-                            Is Being Aggregated: {membership.isBeingAggregated ? "Yes" : "No"}
+                            Bank Data Last Synchronized: {determineSyncDate(membership.successfullyAggregatedAt)}
                         </Typography>
-                        {!membership.isBeingAggregated ?
-                            <LoadingButton
-                                onClick={aggregate}
-                                loading={loading}
-                                loadingIndicator="Aggregating..."
-                                variant="outlined">
-                                Aggregate
-                            </LoadingButton> : <></>
-                        }
-                        <Typography component="div">
-                            Is Authenticated: {membership.isAuthenticated ? "Yes" : "No"}
-                        </Typography>
-                        { !membership.isAuthenticated ?
-                            <Button variant="outlined" onClick={authenticate}>
-                                Authenticate
-                            </Button>: <></>
-                        }
-                        <Typography component="div">
-                            Successfully Aggregated At: {membership.successfullyAggregatedAt == null ? "Never" : membership.successfullyAggregatedAt}
-                        </Typography>
+                        <LoadingButton
+                            onClick={aggregate}
+                            loading={syncing}
+                            loadingIndicator="Syncing..."
+                            variant="outlined"
+                        >
+                            Sync Data
+                        </LoadingButton>
                     </CardContent>
                 </Box>
             </Card>

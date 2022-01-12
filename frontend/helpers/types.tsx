@@ -2,6 +2,13 @@ import { ConnectionStatus, } from "./userEnums";
 import { AccountSubtype, AccountType } from "./accountEnums";
 import { TopLevelTransactionCategory, TransactionCategory } from "./transactionEnums";
 
+export type Challenge = {
+    fieldName: string | null;
+    guid: string;
+    label: string;
+    type: string;
+}
+
 export type User = {
     name: null | string;
     email: string;
@@ -59,13 +66,18 @@ export type Account = {
 export type Membership = {
     guid: string;
     aggregatedAt: string;
-    isBeingAggregated: boolean;
     successfullyAggregatedAt: string;
     connectionStatus: ConnectionStatus;
     isAuthenticated: boolean;
     name: string;
     institutionCode: string;
     userGuid: string;
+    challenges: Challenge[] | null;
+}
+
+export type ChallengeResponse = {
+    guid: string;
+    value: string;
 }
 
 export type CredentialRequest = {
