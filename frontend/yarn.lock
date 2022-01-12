@@ -599,6 +599,11 @@
   "resolved" "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz"
   "version" "0.0.29"
 
+"@types/memory-cache@^0.2.1":
+  "integrity" "sha512-6rmz3bMqJNkj0HIN3AMhOfRN+JhnxxTULeBkwgilfnspjABtKG6ig8mbIzkOjtmiRw+WG1B56z+BO6htGz3IBw=="
+  "resolved" "https://registry.npmjs.org/@types/memory-cache/-/memory-cache-0.2.1.tgz"
+  "version" "0.2.1"
+
 "@types/mongodb@^3.5.27":
   "integrity" "sha512-WcdpPJCakFzcWWD9juKoZbRtQxKIMYF/JIAM4JrNHrMcnJL6/a2NWjXxW7fo9hxboxxkg+icff8d7+WIEvKgYQ=="
   "resolved" "https://registry.npmjs.org/@types/mongodb/-/mongodb-3.6.20.tgz"
@@ -3019,6 +3024,11 @@
   "integrity" "sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g="
   "resolved" "https://registry.npmjs.org/media-typer/-/media-typer-0.3.0.tgz"
   "version" "0.3.0"
+
+"memory-cache@^0.2.0":
+  "integrity" "sha1-eJCwHVLADI68nVM+H46xfjA0hxo="
+  "resolved" "https://registry.npmjs.org/memory-cache/-/memory-cache-0.2.0.tgz"
+  "version" "0.2.0"
 
 "memory-pager@^1.0.2":
   "integrity" "sha512-ZS4Bp4r/Zoeq6+NLJpP+0Zzm0pR8whtGPf1XExKLJBAczGMnSi3It14OiNCStjQjM6NU1okjQGSxgEZN8eBYKg=="

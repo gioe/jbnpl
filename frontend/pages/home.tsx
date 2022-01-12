@@ -22,6 +22,7 @@ import ConnectionsContent from "../components/ConnectionsContent";
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TransactionsContent from "../components/TransactionsContent";
 import { cookiesAreAuthenticated} from "./api/auth";
+import Head from 'next/head'
 
 interface ContentProps {
     contentType: string;

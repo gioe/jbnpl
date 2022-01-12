@@ -18,10 +18,12 @@ import { parseAccounts } from '../helpers/modelParsers';
 const theme = createTheme();
 
 interface AccountProps {
-    accounts: Account[];
+    checkingAccounts: Account[];
+    savingsAccounts: Account[];
 }
 
 function Content(props: AccountProps) {
+    const allAccounts = props.checkingAccounts.concat(props.savingsAccounts)
 
     return <ThemeProvider theme={theme}>
         <CssBaseline />
@@ -40,7 +42,7 @@ function Content(props: AccountProps) {
                 </AccordionSummary>
                 <AccordionDetails>
                     <Typography>
-                        {props.accounts.length > 0 ? `$${props.accounts.filter(value => value.type === AccountType.CHECKING)[0].availableBalance}` : "$0"}
+                        {props.checkingAccounts.length > 0 ? `$${props.checkingAccounts.reduce((sum, account) => sum + account.availableBalance, 0)}` : "$0"}
                     </Typography>
                 </AccordionDetails>
             </Accordion>
@@ -54,7 +56,7 @@ function Content(props: AccountProps) {
                 </AccordionSummary>
                 <AccordionDetails>
                     <Typography>
-                        {props.accounts.length > 0 ? `$${props.accounts.filter(value => value.type === AccountType.SAVINGS)[0].availableBalance}` : "$0"}
+                        {props.savingsAccounts.length > 0 ? `$${props.savingsAccounts.reduce((sum, account) => sum + account.availableBalance, 0)}` : "$0"}
                     </Typography>
                 </AccordionDetails>
             </Accordion>
@@ -68,7 +70,7 @@ function Content(props: AccountProps) {
                 </AccordionSummary>
                 <AccordionDetails>
                     <Typography>
-                        {props.accounts.length > 0 ? `$${Math.round(props.accounts.reduce((sum, current) => sum + current.availableBalance, 0) * 100) / 100}` : "$0"}
+                        {allAccounts.length > 0 ? `$${Math.round(allAccounts.reduce((sum, current) => sum + current.availableBalance, 0) * 100) / 100}` : "$0"}
                     </Typography>
                 </AccordionDetails>
             </Accordion>
@@ -78,7 +80,8 @@ function Content(props: AccountProps) {
 
 export default function AccountsContent() {
 
-    const [accounts, setAccounts] = React.useState<Account[]>([])
+    const [checkingAccounts, setCheckingAccounts] = React.useState<Account[]>([])
+    const [savingsAccounts, setSavingsAccounts] = React.useState<Account[]>([])
 
     useEffect(()=>{
         const fetchAccounts = async () => {
@@ -87,9 +90,12 @@ export default function AccountsContent() {
             return parseAccounts(accounts.response)
         }
         fetchAccounts().then(accounts => {
-            setAccounts(accounts)
+            const checking = accounts.filter(account => account.type === AccountType.CHECKING)
+            const savings = accounts.filter(account => account.type === AccountType.SAVINGS)
+            setCheckingAccounts([...checking])
+            setSavingsAccounts([...savings])
         })
     }, []);
 
-    return <Content accounts={accounts}/>;
+    return <Content checkingAccounts={checkingAccounts} savingsAccounts={savingsAccounts}/>;
 }
