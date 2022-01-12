@@ -48,46 +48,6 @@ exports.getInstitutionCredentials = async (req, res) => {
     res.json({ response: response.data });
 }
 
-exports.establishMembership = async (req, res) => {
-    const userGuid = req.params.userGuid
-    const credentials = req.body.credentials
-    const institutionCode = req.body.institutionCode
-
-    const userId = req.params.userId;
-    const requestBody = {
-        member: {
-            credentials,
-            institution_code: institutionCode,
-        },
-    };
-    const mxResponse = await mxClient.createMember(userGuid, requestBody);
-    const statusResponse = await mxClient.readMemberStatus(mxResponse.data.member.guid, userGuid);
-    const membership = await new Membership(mxResponse.data.member);
-    membership.is_authenticated = statusResponse.data.member.is_authenticated
-    await membership.save()
-    const idRequestBody = {
-        member: {
-            id: membership._id
-        }
-    };
-    await updateMembership(membership.guid, membership.user_guid, idRequestBody)
-
-    User.findByIdAndUpdate(userId, {$push: {memberships: membership._id}}, (err) => {
-        if (err) {
-            return res.status(400).json({error: err})
-        }
-    })
-
-    Membership.find({user_guid: userGuid}, function (err, memberships) {
-        if (err) {
-            return res.status(400).json({
-                error: err
-            });
-        }
-        res.json({response: memberships});
-    }).select("guid institution_code name aggregated_at successfully_aggregated_at connection_status is_authenticated user_guid")
-}
-
 exports.listAccounts = async (req, res) => {
     const userId = req.params.mxId;
     const page = 1;
@@ -144,6 +104,5 @@ exports.getMemberStatus = async (req, res) => {
     const userGuid = req.params.userGuid
 
     const response = await mxClient.readMemberStatus(memberGuid, userGuid);
-    console.log(response.data)
     res.json({ response: response.data });
 }
