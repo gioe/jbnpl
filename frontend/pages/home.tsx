@@ -1,6 +1,5 @@
 import React from "react";
 import { GetServerSideProps } from 'next'
-import AccountsContent from '../components/AccountsContent';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -14,31 +13,37 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import LayersIcon from "@mui/icons-material/Layers";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import SearchIcon from '@mui/icons-material/Search';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import {ListItem, ListItemIcon, ListItemText} from "@mui/material";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import SearchContent from '../components/SearchContent';
 import ConnectionsContent from "../components/ConnectionsContent";
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import TransactionsContent from "../components/TransactionsContent";
+import ScheduleContent from "../components/ScheduleContent";
+import LoanContent from "../components/LoanContent";
 import { cookiesAreAuthenticated} from "./api/auth";
-import Head from 'next/head'
+import {parsePayments} from "../helpers/modelParsers";
+import {getAllPayments} from "./api/mxClient";
+import { Event, Payment} from '../helpers/types';
 
 interface ContentProps {
     contentType: string;
+    payments: Payment[];
+    events: Event[];
 }
+
 const menuItems = [
     {
         text: "Search",
         icon: <SearchIcon />,
     },
     {
-        text: "Transactions",
-        icon: <AttachMoneyIcon />,
+        text: "Schedule",
+        icon: <CalendarTodayIcon />,
     },
     {
-        text: "Accounts",
-        icon: <AccountBalanceIcon />,
+        text: "Loans",
+        icon: <AttachMoneyIcon />,
     },
     {
         text: "Connections",
@@ -105,16 +110,22 @@ function Content(props: ContentProps) {
             return <ConnectionsContent />
         case "Search":
             return <SearchContent />
-        case "Accounts":
-            return <AccountsContent />
-        case "Transactions":
-            return <TransactionsContent />
+        case "Loans":
+            return <LoanContent payments={props.payments}/>
+        case "Schedule":
+            return <ScheduleContent events={props.events} payments={props.payments}/>
         default:
             return <> </>;
     }
 }
 
-const Home = () => {
+
+interface HomeProps {
+    payments: Payment[]
+    events: Event[];
+}
+
+const Home = (props: HomeProps) => {
     const [open, setOpen] = React.useState(true);
     const [contentType, setContentType] = React.useState("Search");
 
@@ -182,8 +193,12 @@ const Home = () => {
                         ))}
                     </List>
                 </Drawer>
-                <Box>
-                    <Content contentType={contentType}/>
+                <Box sx={{ flexGrow: 1 }}>
+                    <Content
+                        contentType={contentType}
+                        payments={props.payments}
+                        events={props.events}
+                    />
                 </Box>
             </Box>
         </ThemeProvider>
@@ -205,7 +220,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
     }
 
+    const mxId = JSON.parse(context.req.cookies.jwt).user.mxId
+    const fetchedPayments = await getAllPayments(mxId, 1)
+    const parsedProps = parsePayments(fetchedPayments)
+
     return {
-        props:{},
+        props: {
+            payments: parsedProps.payments,
+            events: parsedProps.events
+        },
     };
 };

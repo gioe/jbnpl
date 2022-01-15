@@ -1,4 +1,4 @@
-import {ChallengeResponse } from "../../helpers/types";
+import {ChallengeResponse, Payment} from "../../helpers/types";
 import {isAuthenticated} from "./auth";
 import cache from "memory-cache";
 
@@ -57,8 +57,8 @@ export const getAllAccounts = (mxId: string) => {
         .catch(err => console.log(err))
 }
 
-export const getAllTransactions = (mxId: string, page: number) => {
-    return cachedFetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${mxId}/transactions/${page}`,{
+export const getAllPayments = (mxId: string, page: number) => {
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${mxId}/transactions/${page}`,{
         method: "GET",
         headers: {
             Accept: "application/json",
@@ -108,6 +108,21 @@ export const getConnectWidget = (userGuid: string) => {
             Accept: "application/json",
             'Content-Type': 'application/json',
         },
+    })
+        .then(response => {
+            return response.json()
+        })
+        .catch(err => console.log(err))
+}
+
+export const submitPaymentInfo = (payment: Payment) => {
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/transaction/${payment.id}`,{
+        method: "PUT",
+        headers: {
+            Accept: "application/json",
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payment)
     })
         .then(response => {
             return response.json()

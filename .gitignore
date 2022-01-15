@@ -12,14 +12,14 @@
 .pnp.js
 
 # testing
-/coverage
+frontend/coverage
 
 # next.js
 frontend/.next
 /out/
 
 # production
-/build
+frontend/build
 
 # misc
 .DS_Store

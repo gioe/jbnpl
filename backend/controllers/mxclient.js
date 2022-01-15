@@ -1,7 +1,7 @@
 const { Configuration, MxPlatformApi } = require('mx-platform-node');
 const Membership = require("../models/membership");
 const User = require("../models/user");
-const Transaction = require("../models/transaction");
+const Payment = require("../models/payment");
 const {request} = require("express");
 
 const mxConfiguration = new Configuration({
@@ -48,13 +48,18 @@ exports.getInstitutionCredentials = async (req, res) => {
     res.json({ response: response.data });
 }
 
-exports.listAccounts = async (req, res) => {
-    const userId = req.params.mxId;
-    const page = 1;
-    const recordsPerPage = 10;
+// exports.listAccounts = async (req, res) => {
+//     const userId = req.params.mxId;
+//     const page = 1;
+//     const recordsPerPage = 10;
+//
+//     const response = await getUserAccounts(userId, page, recordsPerPage)
+//     res.json({ response: response.data.accounts });
+// }
 
+exports.getUserAccounts = async (userId, page, recordsPerPage) => {
     const response = await mxClient.listUserAccounts(userId, page, recordsPerPage);
-    res.json({ response: response.data.accounts });
+    return response
 }
 
 exports.getAllTransactions = async (req, res) => {
@@ -63,21 +68,40 @@ exports.getAllTransactions = async (req, res) => {
     const recordsPerPage = 100;
 
     const response = await mxClient.listTransactions(memberGuid, undefined, page, recordsPerPage, undefined, undefined);
-    let filteredTransactions = []
-    for (let transaction of response.data.transactions) {
-        if (isFromBNPLVendor(transaction)) {
-            const storedTransaction = await new Transaction(transaction)
-            await storedTransaction.save()
-            filteredTransactions.push(transaction)
+    for (let payment of response.data.transactions) {
+        if (isFromBNPLVendor(payment)) {
+            console.log(payment)
+            storeNewPayment(payment)
         }
     }
-    res.json({ response: response.data.transactions });
+
+    Payment.find((err, payments) => {
+        if (err) {
+            return res.status(400).json({
+                error: err
+            });
+        }
+        res.json(payments);
+    }).select("guid category transacted_at top_level_category amount description original_description type")
+}
+
+const storeNewPayment = (payment) => {
+    Payment.exists({guid: payment.guid}, async function (err, doc) {
+        if (err) {
+            console.log(err)
+        } else if (!doc && isFromBNPLVendor(payment)) {
+            console.log(payment)
+            const newPayment = await new Payment(payment)
+            await newPayment.save()
+        }
+    });
 }
 
 const isFromBNPLVendor = (transaction) => {
     return transaction.original_description.includes("AFFIRM") ||
         transaction.original_description.includes("KLARNA") ||
         transaction.original_description.includes("AFTERPAY")
+        // || transaction.description.includes("Apple")
 }
 
 updateMembership = async (membershipGuid, userGuid, requestBody) => {
@@ -105,4 +129,24 @@ exports.getMemberStatus = async (req, res) => {
 
     const response = await mxClient.readMemberStatus(memberGuid, userGuid);
     res.json({ response: response.data });
+}
+
+
+exports.updateTransaction = async (req, res) => {
+    const transactionId = req.params.transactionId
+
+    Transaction.findByIdAndUpdate(transactionId, {
+        item_name: req.body.itemName,
+        apr: req.body.apr,
+        first_payment_date: req.body.firstPaymentDate,
+        total_payments_required: req.body.totalCost,
+        total_cost: req.body.totalCost,
+
+    }, async function (err, docs) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(docs)
+        }
+    })
 }

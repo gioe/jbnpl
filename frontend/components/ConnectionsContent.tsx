@@ -6,7 +6,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MembershipCard from "./MembershipCard";
 import {
-    Account,
     Membership,
 } from "../helpers/types";
 import {isAuthenticated} from "../pages/api/auth";

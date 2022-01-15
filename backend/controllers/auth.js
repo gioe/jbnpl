@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const expressJwt = require('express-jwt');
 const User = require("../models/user");
-const { createMxUser } = require("./mxclient")
+const { createMxUser, getUserAccounts } = require("./mxclient")
 
 exports.signup = async (req, res) => {
     const userExists = await User.findOne({
@@ -25,7 +25,7 @@ exports.signup = async (req, res) => {
 exports.login = (req, res) => {
     // find the user based on the email
     const { email, password } = req.body;
-    User.findOne({email}, (err, user) => {
+    User.findOne({email}, async (err, user) => {
         // no user or error
         if (err || !user) {
             return res.status(401).json({
@@ -34,19 +34,27 @@ exports.login = (req, res) => {
         }
 
         // does email and password match
-        if(!user.authenticate(password)) {
+        if (!user.authenticate(password)) {
             return res.status(401).json({
                 error: 'Email and password do not match.'
             });
         }
 
         // generate a token with userId and secret
-        const token = jwt.sign({_id : user._id}, process.env.JWT_SECRET);
+        const token = jwt.sign({_id: user._id}, process.env.JWT_SECRET);
         // persist token as 't' in cookie with expiry date
         res.cookie("t", token, {expire: new Date() + 9999});
         // return response with user and token to frontend
-        const {_id, name, email, mxId } = user;
-        return res.json({token, user: { _id, name, email, mxId} });
+        const {_id, name, email, mxId} = user;
+        const accountResponse = await getUserAccounts(mxId, 1, 10)
+        user.liquidity = accountResponse.data.accounts.reduce((previousValue, currentValue) => {
+            if (previousValue.available_balance == null) {
+                return currentValue.available_balance
+            }
+            return previousValue.available_balance + currentValue.available_balance
+        })
+        user.save()
+        res.json({token, user: {_id, name, email, mxId}});
     });
 }
 

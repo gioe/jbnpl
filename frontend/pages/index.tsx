@@ -12,10 +12,6 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {authenticate, login} from "./api/auth";
 import { useCookies } from 'react-cookie';
-import ConnectionsContent from "../components/ConnectionsContent";
-import SearchContent from "../components/SearchContent";
-import AccountsContent from "../components/AccountsContent";
-import TransactionsContent from "../components/TransactionsContent";
 
 function Copyright(props: any) {
     return (

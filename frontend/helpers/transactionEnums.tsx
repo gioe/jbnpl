@@ -1,4 +1,4 @@
-export enum TransactionCategory {
+export enum PaymentCategory {
     CASH = "Cash",
     CHECK = "Check",
     AIR_TRAVEL = "Air Travel",
@@ -98,8 +98,7 @@ export enum TransactionCategory {
     SERVICE_AND_PARTS = "Service & Parts"
 }
 
-
-export enum TopLevelTransactionCategory {
+export enum TopLevelPaymentCategory {
     AUTO_ANT_TRANSPORT = "Auto & Transport",
     BILLS_AND_UTILITIES = "Bills & Utilities",
     BUSINESS_SERVICE = "Business Services",

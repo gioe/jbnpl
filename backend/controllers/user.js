@@ -26,6 +26,7 @@ exports.hasAuthorization = (req, res) => {
         })
     }
 }
+
 exports.getUser = (req, res) => {
     req.profile.hashed_password = undefined;
     req.profile.salt = undefined;

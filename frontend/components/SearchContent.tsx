@@ -35,10 +35,18 @@ export default function SearchContent() {
         const fetchWidgetUrl = async () => {
             const userGuid = isAuthenticated().user.mxId
             const widgetResponse = await getConnectWidget(userGuid)
-            return widgetResponse.response.widget_url.url
+            if (widgetResponse == undefined) {
+                return undefined
+            } else {
+                return widgetResponse.response.widget_url.url
+            }
         }
         fetchWidgetUrl().then(url => {
-            setWidgetUrl(url)
+            if (url == undefined) {
+
+            } else {
+                setWidgetUrl(url)
+            }
         })
     }, []);
 

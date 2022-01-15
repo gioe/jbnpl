@@ -1,6 +1,9 @@
 import { ConnectionStatus, } from "./userEnums";
 import { AccountSubtype, AccountType } from "./accountEnums";
-import { TopLevelTransactionCategory, TransactionCategory } from "./transactionEnums";
+import {
+    PaymentCategory,
+    TopLevelPaymentCategory
+} from "./transactionEnums";
 
 export type Challenge = {
     fieldName: string | null;
@@ -23,29 +26,18 @@ export type Purchase = {
     purchaseSchedule: number;
 }
 
-export type Transaction = {
-    category: TransactionCategory;
-    createdAt: string;
-    date:string;
-    postedAt: string;
-    topLevelCategory: TopLevelTransactionCategory;
-    transactedAt: string;
+export type Payment = {
+    id: string;
+    category: PaymentCategory;
+    topLevelCategory: TopLevelPaymentCategory;
+    transactedAt: Date;
     type: string;
-    accountGuid: string;
     amount: number;
     description: string;
     guid: string;
-    isExpense: boolean;
-    isBillPay: boolean;
-    isDirectDeposit: boolean;
-    isFee: boolean;
-    isIncome: boolean;
-    isOverdraftFee: boolean;
-    isSubscription: boolean;
-    memberGuid: string;
-    merchantGuid: string;
     originalDescription: string;
-    userGuid: string;
+    lender: string;
+    itemName: string;
 }
 
 export type Account = {
@@ -73,6 +65,14 @@ export type Membership = {
     institutionCode: string;
     userGuid: string;
     challenges: Challenge[] | null;
+}
+
+export type Event = {
+    title: string,
+    start: Date,
+    end: Date,
+    allDay?: boolean
+    resource?: any,
 }
 
 export type ChallengeResponse = {
@@ -121,11 +121,16 @@ export type Service = {
     name: string;
 }
 
-export type ServiceSelectionState = {
-    service: Service;
-    isSelected: boolean;
-}
-
 export type Category = {
     name: string;
+}
+
+export type PaymentInfoRequest = {
+    paymentId: string | undefined;
+    itemName: string;
+    totalCost: number;
+    paymentNumber: number;
+    totalMonthlyPayments: number;
+    apr: number;
+    // firstPaymentDate: string | null;
 }
